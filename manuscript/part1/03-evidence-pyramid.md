@@ -193,7 +193,9 @@ Agent가 자율적이라고 해서 모든 tool을 사용해야 하는 것은 아
 
 다음 장에서는 이 여러 signal을 하나의 execution으로 연결하는 기반인 OpenTelemetry를 살펴본다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-PROM-API] Prometheus HTTP API
 - [S-TEMPO-API] Tempo HTTP API

@@ -17,11 +17,11 @@ Agent가 원인 후보를 찾았다.
 - Loki 로그 조회
 - 배포 버전 확인
 
-이 단계에서는 production을 바꿀 이유가 없다.
+이 단계에서는 운영을 바꿀 이유가 없다.
 
 ## 2. 진단 자료를 새로 만드는 순간 권한이 한 단계 올라간다
 
-기존 profile을 읽는 것과 production JVM에서 새 thread dump나 JFR을 뜨는 것은 다르다.
+기존 profile을 읽는 것과 운영 JVM에서 새 thread dump나 JFR을 뜨는 것은 다르다.
 
 heap dump는 더 무겁다.
 
@@ -46,7 +46,7 @@ Agent가 필요하다고 판단했다고 자동 실행할 필요는 없다.
 
 Agent가 로컬 repository를 수정하고 테스트를 돌리는 것은 비교적 안전하다.
 
-하지만 production deployment를 바꾸는 것은 다르다.
+하지만 운영 배포를 바꾸는 것은 다르다.
 
 그래서 작업을 다음처럼 나누는 편이 낫다.
 
@@ -72,7 +72,7 @@ production 반영
 
 운영자는 임시로 traffic을 줄이거나 인스턴스를 늘리거나 문제 기능을 끌 수 있다.
 
-이런 조치는 root cause fix가 아니다.
+이런 조치는 원인 fix가 아니다.
 
 그래서 Agent 기록에도 다음을 구분하는 편이 좋다.
 
@@ -86,13 +86,13 @@ Fix
 
 임시 조치가 성공했다고 문제 해결로 기록하면 다음 장애 때 같은 문제가 반복된다.
 
-## 5. production 변경은 되돌릴 수 있어야 한다
+## 5. 운영 변경은 되돌릴 수 있어야 한다
 
 Agent가 수정안을 만들고 staging에서 검증했다고 하자.
 
-그래도 production에서는 예상하지 못한 문제가 생길 수 있다.
+그래도 운영에서는 예상하지 못한 문제가 생길 수 있다.
 
-그래서 production action에는 최소한 다음이 필요하다.
+그래서 운영 action에는 최소한 다음이 필요하다.
 
 - 변경 전 버전
 - 변경 후 버전
@@ -104,9 +104,9 @@ Agent가 수정안을 만들고 staging에서 검증했다고 하자.
 
 ## 6. 승인도 위험한 작업에 집중한다
 
-모든 Prometheus query마다 사람이 승인해야 한다면 시스템을 쓸 수 없다.
+모든 Prometheus 조회마다 사람이 승인해야 한다면 시스템을 쓸 수 없다.
 
-반대로 production restart나 deployment 변경을 무조건 자동 허용하기도 어렵다.
+반대로 운영 restart나 배포 변경을 무조건 자동 허용하기도 어렵다.
 
 작업을 위험도에 따라 나눈다.
 
@@ -126,11 +126,11 @@ deployment
 
 승인은 높은 위험 작업에 집중한다.
 
-## 7. Agent가 만든 patch도 변경 이유가 보여야 한다
+## 7. Agent가 만든 수정도 변경 이유가 보여야 한다
 
 단순히 diff만 남기지 않는다.
 
-좋은 patch 기록에는 다음 연결이 있어야 한다.
+좋은 수정 기록에는 다음 연결이 있어야 한다.
 
 ~~~text
 확인한 증거
@@ -151,7 +151,7 @@ connection acquire 2.8s
 
 ## 8. 작은 자동화부터 시작한다
 
-처음부터 production auto-remediation을 목표로 할 필요는 없다.
+처음부터 운영 auto-remediation을 목표로 할 필요는 없다.
 
 현실적인 발전 순서는 다음과 같다.
 
@@ -169,9 +169,9 @@ connection acquire 2.8s
 
 > 보는 권한과 바꾸는 권한을 분리한다.
 
-> Agent의 자율성은 production 변경 권한을 많이 주는 것으로 측정하지 않는다.
+> Agent의 자율성은 운영 변경 권한을 많이 주는 것으로 측정하지 않는다.
 
 ### 주요 근거
 
 - [S-GRAFANA-MCP] Grafana MCP
-- JVM runtime evidence research
+- JVM runtime 증거 research

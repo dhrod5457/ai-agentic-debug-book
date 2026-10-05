@@ -162,6 +162,6 @@ Pod와 Node 상태까지 봤다면 한 가지 질문이 더 남는다.
 
 출처 상세: [References](../references.md)
 
-- Kubernetes runtime 증거 research
+- [S-K8S-EVENT] Kubernetes Event API
 - [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
 - [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping

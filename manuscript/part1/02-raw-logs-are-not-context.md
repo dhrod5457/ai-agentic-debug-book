@@ -187,7 +187,7 @@ Agent에게 'No errors found'라는 결과가 돌아왔다고 하자.
 
 실제로는 100000 lines 중 앞 1000줄만 반환된 결과라면 결론은 완전히 달라진다.
 
-그래서 tool response에는 조회 result뿐 아니라 한계도 들어가야 한다.
+그래서 tool response에는 조회 결과뿐 아니라 한계도 들어가야 한다.
 
 ~~~text
 sampled=true

@@ -21,7 +21,7 @@ GC
 queue depth
 ~~~
 
-Metric은 root cause를 직접 말해주지 않는다. 대신 문제 공간을 줄인다.
+Metric은 원인를 직접 말해주지 않는다. 대신 문제 공간을 줄인다.
 
 예를 들어 login p99는 상승했는데 DB CPU는 정상이고 Hikari pending이 급증했다면 DB 자체보다 connection acquisition 쪽을 먼저 볼 이유가 생긴다.
 
@@ -29,7 +29,7 @@ Metric은 root cause를 직접 말해주지 않는다. 대신 문제 공간을 �
 
 ## 2. Traces — 실제 execution path를 보여준다
 
-Metric이 집계라면 trace는 구체적인 request다.
+Metric이 집계라면 trace는 구체적인 요청다.
 
 ~~~text
 POST /checkout 2.8s
@@ -39,9 +39,9 @@ POST /checkout 2.8s
  └─ save order 20ms
 ~~~
 
-이제 slow request가 어디서 시간을 썼는지 볼 수 있다.
+이제 slow 요청가 어디서 시간을 썼는지 볼 수 있다.
 
-하지만 trace 역시 root cause 그 자체는 아니다. external API span이 느린 이유가 network, upstream saturation, retry, DNS, connection pool, timeout configuration 중 무엇인지는 추가 evidence가 필요하다.
+하지만 trace 역시 원인 그 자체는 아니다. external API span이 느린 이유가 network, upstream saturation, retry, DNS, connection pool, timeout configuration 중 무엇인지는 추가 증거가 필요하다.
 
 ## 3. Logs — execution에서 무슨 사건이 있었는지 보여준다
 
@@ -73,27 +73,27 @@ LockSupport.park
 application method
 ~~~
 
-Pyroscope처럼 trace와 profile을 연결할 수 있으면 Agent는 특정 request의 느린 구간에서 어떤 코드가 시간을 사용했는지 더 직접적으로 좁힐 수 있다.
+Pyroscope처럼 trace와 profile을 연결할 수 있으면 Agent는 특정 요청의 느린 구간에서 어떤 코드가 시간을 사용했는지 더 직접적으로 좁힐 수 있다.
 
 ## 5. JVM diagnostics — 더 깊이 들어갈 때 사용한다
 
-Java 애플리케이션에서는 JFR과 thread dump가 강력하다. 하지만 이 evidence는 일반 metric query보다 비싸다.
+Java 애플리케이션에서는 JFR과 thread dump가 강력하다. 하지만 이 증거는 일반 metric 조회보다 비싸다.
 
 Thread dump는 deadlock, blocked thread, thread pool starvation을 보여준다. JFR은 allocation, GC, lock, socket I/O, thread park 같은 runtime event를 보여준다. Heap dump는 retained object와 memory leak를 추적하는 데 강하다.
 
 여기서 중요한 것은 '가능하면 다 수집'이 아니다. 필요한 경우 단계적으로 내려간다.
 
-## 6. Database evidence — SQL만 보면 부족하다
+## 6. Database 증거 — SQL만 보면 부족하다
 
 다음 SQL이 2.8초 걸렸다고 보인다고 하자.
 
 실제로 DB execution은 30ms였고 connection을 얻는 데 2.7초 걸렸다면 SQL 튜닝은 잘못된 수정이다.
 
-DB debugging에는 connection acquire, query execute, lock wait, network, pool state, DB resource를 구분해야 한다.
+DB debugging에는 connection acquire, 조회 execute, lock wait, network, pool state, DB resource를 구분해야 한다.
 
-OpenTelemetry의 DB semantic convention도 query summary와 query text를 구분한다. Agent에게는 low-cardinality query summary와 duration/error를 먼저 주는 편이 안전하다. parameter 값은 기본적으로 숨기는 것이 낫다.
+OpenTelemetry의 DB semantic convention도 조회 summary와 조회 text를 구분한다. Agent에게는 low-cardinality 조회 summary와 duration/error를 먼저 주는 편이 안전하다. parameter 값은 기본적으로 숨기는 것이 낫다.
 
-## 7. Platform evidence — 코드가 문제가 아닐 수 있다
+## 7. Platform 증거 — 코드가 문제가 아닐 수 있다
 
 Kubernetes 환경에서는 애플리케이션 장애가 platform에서 시작될 수 있다.
 
@@ -105,11 +105,11 @@ FailedScheduling
 ImagePullBackOff
 ~~~
 
-Kubernetes Event는 중요한 힌트다. 하지만 Event 하나를 canonical truth로 보면 위험하다. Pod status, container state, resource metric, deployment revision을 함께 봐야 한다.
+Kubernetes Event는 중요한 힌트다. 하지만 Event 하나를 canonical truth로 보면 위험하다. Pod status, container state, resource metric, 배포 revision을 함께 봐야 한다.
 
 ## 8. Artifact identity — 어떤 코드가 실제로 실행됐는가
 
-이 evidence는 자주 빠진다.
+이 증거는 자주 빠진다.
 
 ~~~text
 service.version
@@ -126,11 +126,11 @@ config version
 현재 workspace = commit B
 ~~~
 
-일 수 있기 때문이다. Runtime version을 확인하지 않은 patch는 논리적으로 불완전하다.
+일 수 있기 때문이다. Runtime version을 확인하지 않은 수정는 논리적으로 불완전하다.
 
 ## 9. 증거를 단계별로 본다
 
-모든 evidence를 같은 비용으로 취급하지 말자.
+모든 증거를 같은 비용으로 취급하지 말자.
 
 ~~~text
 Level 0
@@ -165,11 +165,11 @@ Container Exec
 
 ## 10. 왜 escalation이 필요한가
 
-첫째는 운영 비용 때문이다. heap dump는 metric query와 같은 행위가 아니다.
+첫째는 운영 비용 때문이다. heap dump는 metric 조회와 같은 행위가 아니다.
 
 둘째는 보안 때문이다. heap에는 사용자 데이터와 credential fragment가 있을 수 있다.
 
-셋째는 권한 때문이다. 기존 JFR 파일을 읽는 것과 production JVM에서 새 recording을 시작하는 것은 다른 권한이다.
+셋째는 권한 때문이다. 기존 JFR 파일을 읽는 것과 운영 JVM에서 새 recording을 시작하는 것은 다른 권한이다.
 
 그래서 다음을 분리해야 한다.
 
@@ -179,17 +179,17 @@ Container Exec
 
 Agent가 자율적이라고 해서 모든 tool을 사용해야 하는 것은 아니다.
 
-좋은 debugging trajectory는 보통 metric에서 service를 좁히고, trace에서 operation을 좁히고, log/profile에서 원인 후보를 좁힌 뒤 그래도 구분이 안 될 때 JFR/thread로 내려간다.
+좋은 debugging trajectory는 보통 metric에서 서비스를 좁히고, trace에서 operation을 좁히고, log/profile에서 원인 후보를 좁힌 뒤 그래도 구분이 안 될 때 JFR/thread로 내려간다.
 
 반대로 첫 단계에서 heap dump부터 요청한다면 시스템 설계가 잘못된 것이다.
 
 ## 12. 세 번째 원칙
 
-> Evidence는 종류마다 역할과 비용이 다르다.
+> 증거는 종류마다 역할과 비용이 다르다.
 
 그리고:
 
-> 낮은 비용의 evidence로 먼저 좁히고, 필요한 경우에만 더 비싼 evidence로 escalation한다.
+> 낮은 비용의 증거로 먼저 좁히고, 필요한 경우에만 더 비싼 증거로 escalation한다.
 
 다음 장에서는 이 여러 signal을 하나의 execution으로 연결하는 기반인 OpenTelemetry를 살펴본다.
 
@@ -198,4 +198,4 @@ Agent가 자율적이라고 해서 모든 tool을 사용해야 하는 것은 아
 - [S-PROM-API] Prometheus HTTP API
 - [S-TEMPO-API] Tempo HTTP API
 - [S-PYROSCOPE] Grafana Pyroscope
-- [S-SPRING-OBS] Spring Boot Observability
+- [S-SPRING-OBS] Spring Boot 관측 시스템

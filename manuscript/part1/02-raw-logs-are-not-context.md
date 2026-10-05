@@ -60,7 +60,7 @@ OpenRCA가 흥미로운 이유도 여기에 있다. 이 benchmark의 RCA-agent b
 
 데이터는 실행 환경에 남긴다. 모델에는 결과를 가져온다.
 
-## 3. Model Context는 Telemetry Working Set이 아니다
+## 3. 모델이 읽는 내용과 실제 관측 데이터 전체는 다르다
 
 이 차이를 명확히 해두자.
 
@@ -90,7 +90,7 @@ source diff
 
 이 책에서는 다음 원칙을 사용한다.
 
-> Model Context ≠ Telemetry Working Set
+> 모델이 한 번에 읽는 내용과 관측 데이터 전체는 같은 것이 아니다.
 
 Telemetry는 query 가능한 외부 상태로 남겨두는 편이 낫다. Agent는 필요한 evidence만 단계적으로 가져온다.
 
@@ -175,13 +175,13 @@ Agent
 
 Agent는 먼저 문제 시간대의 login-service p99 latency를 묻는다. 그 결과를 보고 Hikari pending connection을 묻는다. 다음에는 3초 이상 걸린 trace 몇 개를 찾고, 그중 하나의 trace ID로 로그를 검색한다.
 
-이것이 progressive narrowing이다. 넓게 보고 좁혀간다.
+이렇게 넓은 현상에서 시작해 필요한 자료만 단계적으로 좁혀간다.
 
-## 8. Evidence Retrieval도 무제한이면 안 된다
+## 8. 필요한 자료를 찾는 과정도 무제한이면 안 된다
 
 Pull 방식이라고 자동으로 안전해지는 것은 아니다. Agent가 30일 전체 로그를 검색하도록 놔두면 observability backend 자체에 부담을 줄 수 있다.
 
-그래서 query budget이 필요하다.
+그래서 한 번에 얼마나 조회할 수 있는지 제한이 필요하다.
 
 ~~~text
 max_time_range = 30m
@@ -219,7 +219,7 @@ OpenRCA의 Executor도 큰 DataFrame 결과가 잘린 경우 observation bias �
 
 그리고:
 
-> Push Context보다 Pull Evidence가 확장 가능하다.
+> 모든 로그를 밀어 넣기보다 필요한 자료를 그때그때 찾아보는 방식이 확장하기 쉽다.
 
 Agent에게 모든 로그를 읽게 하지 않는다. 대신 scope → aggregate → representative execution → local evidence → source 순서로 필요한 evidence를 가져오게 한다.
 

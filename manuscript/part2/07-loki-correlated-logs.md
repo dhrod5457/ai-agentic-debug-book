@@ -8,7 +8,7 @@ Trace를 통해 느린 request와 suspicious span을 찾았다.
 
 이미 service, time range, trace ID가 있다.
 
-## 1. 로그 검색의 질은 scope에서 결정된다
+## 1. 로그는 범위를 좁힌 뒤 검색한다
 
 나쁜 query는 전체 production 로그에서 timeout을 검색한다.
 
@@ -20,7 +20,7 @@ range=09:12:10~09:12:14
 trace_id=abc
 ~~~
 
-범위가 좁아질수록 irrelevant evidence가 줄어든다.
+범위가 좁아질수록 관계없는 로그가 크게 줄어든다.
 
 ## 2. Label과 Structured Metadata를 구분한다
 
@@ -54,7 +54,7 @@ pending=37
 
 물론 모든 로그를 구조화할 수는 없다. 그래서 raw message와 structured fields를 함께 유지하는 방식이 현실적이다.
 
-## 4. Stack trace도 projection이 필요하다
+## 4. Stack trace도 처음부터 전부 보여줄 필요는 없다
 
 긴 Java stack trace를 매번 전부 Agent에 줄 필요는 없다.
 
@@ -69,7 +69,7 @@ pending=37
 
 Agent가 더 필요하면 full stack을 요청한다.
 
-이것도 progressive disclosure다.
+필요한 만큼만 먼저 보여주고, 더 필요할 때 펼쳐보는 방식이다.
 
 ## 5. Loki query에도 예산이 필요하다
 
@@ -80,7 +80,7 @@ Grafana MCP는 Loki query에 대해 최대 scan bytes와 최대 effective time r
 이 패턴은 매우 중요하다.
 
 ~~~text
-Agent Query Budget
+Agent 조회 제한
 = scope
 + time range
 + scan bytes

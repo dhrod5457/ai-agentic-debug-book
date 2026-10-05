@@ -24,21 +24,21 @@ GET /orders 1.8s
 
 각 SQL 하나만 보면 빠르다.
 
-문제는 같은 종류의 query가 수십 번, 수백 번 반복된다는 점이다.
+문제는 같은 종류의 조회가 수십 번, 수백 번 반복된다는 점이다.
 
 ## 2. 느린 SQL만 찾으면 놓칠 수 있다
 
-일반적인 slow query 분석은 오래 걸린 SQL을 찾는 데 강하다.
+일반적인 slow 조회 분석은 오래 걸린 SQL을 찾는 데 강하다.
 
-하지만 N+1에서는 각각의 query가 짧다.
+하지만 N+1에서는 각각의 조회가 짧다.
 
 그래서 다음 질문이 더 중요하다.
 
-> 한 request에서 같은 query가 몇 번 실행됐는가?
+> 한 요청에서 같은 조회가 몇 번 실행됐는가?
 
-## 3. query summary로 묶어 본다
+## 3. 조회 summary로 묶어 본다
 
-원문 SQL 전체보다 query summary를 이용하면 같은 종류의 query를 묶기 쉽다.
+원문 SQL 전체보다 조회 summary를 이용하면 같은 종류의 조회를 묶기 쉽다.
 
 예:
 ~~~text
@@ -50,7 +50,7 @@ SELECT customer      x120
 
 ## 4. 데이터 양과 호출 수를 비교한다
 
-10건을 조회할 때 customer query가 10번, 100건을 조회할 때 100번이라면 관계가 거의 그대로 드러난다.
+10건을 조회할 때 customer 조회가 10번, 100건을 조회할 때 100번이라면 관계가 거의 그대로 드러난다.
 
 ~~~text
 rows=10   → child query 10
@@ -70,13 +70,13 @@ Repository 하나만 보는 것이 아니라 loop 안에서 lazy relation이나 
 
 이 문제를 찾는 데 customer ID 실제 값은 필요하지 않다.
 
-query 종류와 호출 횟수만으로도 충분하다.
+조회 종류와 호출 횟수만으로도 충분하다.
 
 민감한 parameter를 Agent에게 넘기지 않아도 디버깅할 수 있다는 좋은 예다.
 
 ## 7. 수정 후 무엇을 확인할까
 
-fetch join, batch fetch, bulk query 등으로 수정한 뒤 같은 요청을 다시 실행한다.
+fetch join, batch fetch, bulk 조회 등으로 수정한 뒤 같은 요청을 다시 실행한다.
 
 비교할 것은 다음이다.
 
@@ -102,9 +102,9 @@ latency = 180ms
 
 > N+1은 '느린 SQL' 문제가 아니라 '너무 많은 SQL' 문제다.
 
-> Agent가 query 시간뿐 아니라 한 요청 안의 반복 횟수를 볼 수 있어야 한다.
+> Agent가 조회 시간뿐 아니라 한 요청 안의 반복 횟수를 볼 수 있어야 한다.
 
 ### 주요 근거
 
-- SQL/database evidence research
+- SQL/database 증거 research
 - [S-TEMPO-API] Tempo HTTP API

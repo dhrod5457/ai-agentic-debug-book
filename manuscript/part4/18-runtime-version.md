@@ -105,4 +105,5 @@ revision 42 error rate 증가
 
 - [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
 - [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping
-- OpenTelemetry 서비스/container semantic conventions
+- [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
+- [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping

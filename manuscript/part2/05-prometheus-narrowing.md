@@ -12,7 +12,7 @@ Prometheus는 이 단계에 잘 맞는다.
 
 예를 들어 로그인 지연이 보고됐다.
 
-Agent가 처음부터 login-서비스 로그 10만 줄을 읽는 대신 다음을 확인한다.
+Agent가 처음부터 login-service 로그 10만 줄을 읽는 대신 다음을 확인한다.
 
 ~~~text
 request rate
@@ -70,7 +70,7 @@ Metric은 aggregate다.
 p99 = 3.1s
 ~~~
 
-이 값만으로는 어떤 요청가 3초 걸렸는지 알 수 없다.
+이 값만으로는 어떤 요청이 3초 걸렸는지 알 수 없다.
 
 Exemplar가 trace ID를 가지고 있으면 aggregate anomaly에서 concrete execution으로 이동할 수 있다.
 

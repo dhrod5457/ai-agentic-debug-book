@@ -1,6 +1,6 @@
 # 7장. Loki에서 같은 execution의 로그를 찾는다
 
-Trace를 통해 느린 요청와 suspicious span을 찾았다.
+Trace를 통해 느린 요청과 suspicious span을 찾았다.
 
 이제 로그를 본다.
 

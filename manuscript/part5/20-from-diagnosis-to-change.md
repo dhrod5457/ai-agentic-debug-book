@@ -170,3 +170,8 @@ connection acquire 2.8s
 > 보는 권한과 바꾸는 권한을 분리한다.
 
 > Agent의 자율성은 production 변경 권한을 많이 주는 것으로 측정하지 않는다.
+
+### 주요 근거
+
+- [S-GRAFANA-MCP] Grafana MCP
+- JVM runtime evidence research

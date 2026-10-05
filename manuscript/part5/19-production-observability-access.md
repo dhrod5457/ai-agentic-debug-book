@@ -152,3 +152,8 @@ login-service만 조사하는 Agent profile을 생각해보자.
 > 운영 관측 권한은 처음부터 최소한으로 준다.
 
 > 읽기 권한, 데이터 범위, 조회 비용, 민감정보를 각각 따로 통제한다.
+
+### 주요 근거
+
+- [S-GRAFANA-MCP] Grafana MCP
+- telemetry governance research

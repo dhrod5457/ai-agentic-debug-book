@@ -21,7 +21,7 @@ GC
 queue depth
 ~~~
 
-Metric은 원인를 직접 말해주지 않는다. 대신 문제 공간을 줄인다.
+Metric은 원인을 직접 말해주지 않는다. 대신 문제 공간을 줄인다.
 
 예를 들어 login p99는 상승했는데 DB CPU는 정상이고 Hikari pending이 급증했다면 DB 자체보다 connection acquisition 쪽을 먼저 볼 이유가 생긴다.
 

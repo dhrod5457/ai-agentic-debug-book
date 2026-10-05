@@ -141,7 +141,9 @@ Backend
 
 > Agent가 볼 수 있는 흔적을 남기되, 같은 요청과 같은 실행 버전을 서로 연결할 수 있어야 한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-SPRING-OBS] Spring Boot 관측 시스템
 - [S-OTEL-LOGS] OpenTelemetry Logging Specification

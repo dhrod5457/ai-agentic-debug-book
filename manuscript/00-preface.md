@@ -8,7 +8,7 @@
 
 사람은 이런 문제를 소스코드만 보고 풀지 않는다.
 
-Grafana를 열어 지표를 본다. Prometheus에서 오류율과 지연시간을 확인한다. Tempo에서 느린 trace를 찾는다. Loki에서 같은 trace ID를 가진 로그를 검색한다. 필요하면 profiler를 열고, thread dump를 뜨고, Kubernetes Event와 배포 revision을 확인한다. 데이터베이스 connection pool과 slow 조회를 비교한다. 마지막에는 장애가 발생한 버전과 현재 checkout된 코드가 같은지도 확인한다.
+Grafana를 열어 지표를 본다. Prometheus에서 오류율과 지연시간을 확인한다. Tempo에서 느린 trace를 찾는다. Loki에서 같은 trace ID를 가진 로그를 검색한다. 필요하면 profiler를 열고, thread dump를 뜨고, Kubernetes Event와 배포 revision을 확인한다. 데이터베이스 connection pool과 slow query를 비교한다. 마지막에는 장애가 발생한 버전과 현재 checkout된 코드가 같은지도 확인한다.
 
 그런데 Coding Agent에게는 종종 이 중 아무것도 주어지지 않는다.
 
@@ -26,7 +26,7 @@ Grafana를 열어 지표를 본다. Prometheus에서 오류율과 지연시간�
 
 > Agent에게 어떤 증거를, 어떤 범위로, 어떤 순서로, 어떤 권한 아래에서 조회하게 해야 하는가?
 
-이 책에서는 이를 실행 증거(Runtime Evidence)라고 부른다. 이 용어는 외부 표준이 아니라 이 책의 설명을 위해 정리한 표현다.
+이 책에서는 이를 실행 증거(Runtime Evidence)라고 부른다. 이 용어는 외부 표준이 아니라 이 책의 설명을 위해 정리한 표현이다..
 
 실행 증거에는 로그만 들어가지 않는다.
 
@@ -65,7 +65,7 @@ Artifact
   └─ source commit
 ~~~
 
-이 정보는 모두 같은 가치와 비용을 가지지 않는다. Prometheus metric 조회는 저렴하지만 heap dump는 비싸다. trace는 요청 경로를 보여주지만 원인를 자동으로 알려주지는 않는다. Kubernetes Event는 힌트지만 canonical truth가 아니다. SQL text는 유용하지만 parameter에는 개인정보가 들어갈 수 있다.
+이 정보는 모두 같은 가치와 비용을 가지지 않는다. Prometheus metric 조회는 저렴하지만 heap dump는 비싸다. trace는 요청 경로를 보여주지만 원인을 자동으로 알려주지는 않는다. Kubernetes Event는 힌트지만 canonical truth가 아니다. SQL text는 유용하지만 parameter에는 개인정보가 들어갈 수 있다.
 
 그래서 이 책은 "더 많은 정보"보다 "더 좋은 관측 인터페이스"를 설계하는 데 집중한다.
 

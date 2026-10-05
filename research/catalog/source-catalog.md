@@ -330,3 +330,40 @@
 5. evidence availability와 reasoning correctness는 별개다.
 6. production observability access는 기본 read-only로 시작한다.
 7. 2026년 현재 Grafana와 Tempo는 Agent용 MCP 인터페이스를 공식적으로 제공하므로 이 책은 가상의 구조가 아니라 실제 OSS 기반으로 실습할 수 있다.
+
+## J. Telemetry-to-Agent Benchmark Construction
+
+### [S-BTS-AGENTBENCH] BTS-AgentBench
+
+- Type: PREPRINT / OSS / BENCHMARK
+- Source: https://arxiv.org/abs/2608.27334
+- Repository: https://github.com/kjy7567/BTS-AgentBench
+- 게시: 2026-08
+- 확인점:
+  - read-only telemetry를 normalized tool store로 변환하고 typed, bounded multi-turn agent episode를 구성한다.
+  - telemetry value, tool output, evidence ID, verifier를 deterministic code path로 생성한다.
+  - 532개 BTS episode와 별도 XAI4HEAT portability corpus를 공개한다.
+  - construction/scoring의 deterministic boundary와 hosted model generation의 nondeterministic boundary를 분리한다.
+- Agentic Debugging 의미:
+  - Agent Debug Session Contract를 benchmark episode로 고정할 수 있다는 직접적 설계 근거다.
+  - gold answer만 아니라 tool-derived gold evidence와 provenance를 함께 보존하는 방식이 debugging experiment에 적합하다.
+- 일반화 한계:
+  - building telemetry를 대상으로 하며 software observability/log/trace benchmark는 아니다.
+- Principle 후보:
+  - Read-only Telemetry → Typed Bounded Episode
+  - Gold Answer ≠ Gold Evidence
+  - Construction Determinism ≠ Model Determinism
+
+### [S-AGENTDEBUGX] AgentDebugX
+
+- Type: PREPRINT / OSS
+- Source: https://arxiv.org/abs/2607.18754
+- 게시: 2026-07
+- 확인점:
+  - Agent 자체 실패를 Detect → Attribute → Recover → Rerun의 closed loop로 다룬다.
+  - trajectory-level attribution과 recovery를 분리한다.
+- Agentic Debugging 의미:
+  - 대상은 application runtime이 아니라 Agent trajectory이므로 이 책의 중심 자료는 아니다.
+  - 다만 root-cause diagnosis가 repair/rerun까지 이어져야 한다는 closed-loop 구조의 보조 근거로 사용한다.
+- 일반화 한계:
+  - application logs/metrics/traces를 통한 production debugging 연구로 해석하지 않는다.

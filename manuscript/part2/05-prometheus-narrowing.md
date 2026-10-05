@@ -60,7 +60,7 @@ Tool gateway는 다음을 제한할 수 있다.
 - sample count
 - 조회 timeout
 
-Agent에게 조회 capability를 주는 것과 관측 시스템 backend 전체를 맡기는 것은 다르다.
+Agent에게 조회 권한를 주는 것과 관측 데이터 저장소 전체를 맡기는 것은 다르다.
 
 ## 4. Exemplars가 중요한 이유
 

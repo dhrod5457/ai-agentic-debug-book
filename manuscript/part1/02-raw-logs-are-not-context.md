@@ -212,7 +212,9 @@ Agent에게 모든 로그를 읽게 하지 않는다. 대신 scope → aggregate
 
 다음 장에서는 이 증거가 로그만으로 구성되지 않는 이유를 살펴본다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OPENRCA] OpenRCA
 - [S-GRAFANA-MCP] Grafana MCP

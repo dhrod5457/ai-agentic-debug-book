@@ -28,7 +28,7 @@ GET /orders 1.8s
 
 ## 2. 느린 SQL만 찾으면 놓칠 수 있다
 
-일반적인 slow 조회 분석은 오래 걸린 SQL을 찾는 데 강하다.
+일반적인 slow query 분석은 오래 걸린 SQL을 찾는 데 강하다.
 
 하지만 N+1에서는 각각의 조회가 짧다.
 
@@ -36,9 +36,9 @@ GET /orders 1.8s
 
 > 한 요청에서 같은 조회가 몇 번 실행됐는가?
 
-## 3. 조회 summary로 묶어 본다
+## 3. query summary로 묶어 본다
 
-원문 SQL 전체보다 조회 summary를 이용하면 같은 종류의 조회를 묶기 쉽다.
+원문 SQL 전체보다 query summary를 이용하면 같은 종류의 조회를 묶기 쉽다.
 
 예:
 ~~~text
@@ -108,5 +108,5 @@ latency = 180ms
 
 출처 상세: [References](../references.md)
 
-- SQL/database 증거 research
+- [S-OTEL-SQL] OpenTelemetry SQL database semantic conventions
 - [S-TEMPO-API] Tempo HTTP API

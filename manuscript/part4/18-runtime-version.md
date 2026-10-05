@@ -14,7 +14,7 @@ Agent가 현재 main branch를 열어 142번째 줄을 본다.
 
 ## 1. line number를 믿기 전에 버전을 확인한다
 
-먼저 장애 trace나 로그에서 service.version을 본다.
+먼저 장애 trace나 로그에서 서비스.version을 본다.
 
 ~~~text
 service.version = a81c92f
@@ -45,9 +45,9 @@ myapp:latest
 sha256:ab34...
 ~~~
 
-## 3. Deployment revision을 같이 본다
+## 3. 배포 revision을 같이 본다
 
-Kubernetes에서는 deployment revision을 통해 어느 rollout에서 문제가 시작됐는지 확인할 수 있다.
+Kubernetes에서는 배포 revision을 통해 어느 rollout에서 문제가 시작됐는지 확인할 수 있다.
 
 ~~~text
 revision 41 정상
@@ -58,7 +58,7 @@ revision 42 error rate 증가
 
 ## 4. Agent가 해야 할 첫 행동이 바뀐다
 
-버전이 다르면 바로 patch를 만들지 않는다.
+버전이 다르면 바로 수정를 만들지 않는다.
 
 먼저 다음 중 하나를 한다.
 
@@ -69,9 +69,9 @@ revision 42 error rate 증가
 
 ## 5. 오래된 장애도 있다
 
-운영에서 이미 새 버전이 배포돼 문제가 사라졌는데 과거 incident를 분석하고 있을 수도 있다.
+운영에서 이미 새 버전이 배포돼 문제가 사라졌는데 과거 장애를 분석하고 있을 수도 있다.
 
-이때 현재 telemetry와 과거 로그를 섞으면 잘못된 결론이 나온다.
+이때 현재 관측 데이터와 과거 로그를 섞으면 잘못된 결론이 나온다.
 
 시간과 버전을 함께 봐야 한다.
 
@@ -85,11 +85,11 @@ revision 42 error rate 증가
 - timeout
 - retry count
 
-그래서 가능하면 config version이나 deployment configuration diff도 함께 확인한다.
+그래서 가능하면 config version이나 배포 configuration diff도 함께 확인한다.
 
 ## 7. 수정 후 배포 버전까지 확인한다
 
-patch가 만들어졌다면 실제로 그 patch가 들어간 image가 배포됐는지 확인해야 한다.
+수정가 만들어졌다면 실제로 그 수정가 들어간 image가 배포됐는지 확인해야 한다.
 
 테스트 결과와 운영 결과 사이에도 version 연결이 필요하다.
 
@@ -102,4 +102,4 @@ patch가 만들어졌다면 실제로 그 patch가 들어간 image가 배포됐�
 ### 주요 근거
 
 - runtime/source version correlation research
-- OpenTelemetry service/container semantic conventions
+- OpenTelemetry 서비스/container semantic conventions

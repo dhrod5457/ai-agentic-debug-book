@@ -42,7 +42,7 @@ Agent는 잘못된 지시를 받으면 30일 전체 로그를 검색할 수도 �
 - 조회 가능한 environment
 - 쓰기 기능 비활성화
 
-Grafana MCP는 실제로 이런 제한을 둘 수 있다.
+Grafana MCP는 실제로 이런 제한을 둘 수 있다. 다만 Loki 비용 guardrail은 현재 기본 모드가 `off`이므로 운영에서 보호 장치로 쓰려면 `enforce`를 명시적으로 설정해야 한다.
 
 ## 3. Grafana MCP에서 읽기 기능만 남길 수 있다
 

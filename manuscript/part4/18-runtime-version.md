@@ -98,3 +98,8 @@ patch가 만들어졌다면 실제로 그 patch가 들어간 image가 배포됐�
 > 운영 장애를 고치기 전에 지금 보고 있는 코드가 실제 운영 코드인지 먼저 확인한다.
 
 > tag보다 commit과 image digest처럼 바뀌지 않는 식별자가 더 믿을 만하다.
+
+### 주요 근거
+
+- runtime/source version correlation research
+- OpenTelemetry service/container semantic conventions

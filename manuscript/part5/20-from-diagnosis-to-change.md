@@ -176,4 +176,4 @@ connection acquire 2.8s
 출처 상세: [References](../references.md)
 
 - [S-GRAFANA-MCP] Grafana MCP
-- JVM runtime 증거 research
+- [S-ORACLE-JCMD] Oracle JDK 25 — jcmd/JFR

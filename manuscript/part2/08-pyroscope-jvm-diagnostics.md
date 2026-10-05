@@ -25,7 +25,7 @@ wall profile에서 LockSupport.park가 대부분이라면 CPU optimization은 �
 
 Pyroscope는 profile과 trace를 연결할 수 있다.
 
-특정 slow span에서 profile을 조회하면 전체 service profile보다 훨씬 좁은 evidence를 얻을 수 있다.
+특정 slow span에서 profile을 조회하면 전체 서비스 profile보다 훨씬 좁은 증거를 얻을 수 있다.
 
 ~~~text
 slow trace
@@ -54,9 +54,9 @@ Java Flight Recorder는 JVM runtime event를 기록한다.
 - socket I/O
 - file I/O
 
-하지만 JFR도 원본 파일 전체를 model context에 넣는 대상은 아니다.
+하지만 JFR도 원본 파일 전체를 model 맥락에 넣는 대상은 아니다.
 
-incident window의 event summary나 top contention 같은 projection을 제공하는 편이 낫다.
+장애 window의 event summary나 top contention 같은 projection을 제공하는 편이 낫다.
 
 ## 4. Thread dump가 유효한 장애
 
@@ -65,7 +65,7 @@ Thread dump는 특히 다음 문제에서 강하다.
 - deadlock
 - blocked thread
 - executor starvation
-- stuck request
+- stuck 요청
 - synchronized contention
 
 Agent가 보기 좋은 형태는 raw dump 수천 줄보다 다음 요약일 수 있다.
@@ -88,9 +88,9 @@ none
 
 Memory leak를 의심한다고 바로 heap dump부터 뜨는 것은 좋지 않다.
 
-먼저 heap usage, GC pause, allocation profile, JFR evidence로 범위를 좁힐 수 있다.
+먼저 heap usage, GC pause, allocation profile, JFR 증거로 범위를 좁힐 수 있다.
 
-heap dump는 크고 민감하며 production pause와 저장 비용을 유발할 수 있다.
+heap dump는 크고 민감하며 운영 pause와 저장 비용을 유발할 수 있다.
 
 그래서 가벼운 확인부터 시작해 필요한 경우에만 더 깊은 진단으로 내려가야 한다.
 
@@ -102,11 +102,11 @@ metrics
 → heap dump
 ~~~
 
-실제 순서는 장애에 따라 달라질 수 있지만 비용이 높은 evidence를 자동 기본값으로 두지 않는 것이 핵심이다.
+실제 순서는 장애에 따라 달라질 수 있지만 비용이 높은 증거를 자동 기본값으로 두지 않는 것이 핵심이다.
 
 ## 6. 권한도 단계적으로 올라가야 한다
 
-기존 profile을 읽는 것과 production JVM에서 새 JFR을 시작하는 것은 다르다.
+기존 profile을 읽는 것과 운영 JVM에서 새 JFR을 시작하는 것은 다르다.
 
 그래서 권한을 구분한다.
 
@@ -132,11 +132,11 @@ Capture는 별도의 audit와 승인 정책을 둘 수 있다.
 
 좋은 Agent는 다음 질문을 한다.
 
-> 지금 가진 evidence로 competing hypothesis를 구분할 수 있는가?
+> 지금 가진 증거로 competing 원인 후보를 구분할 수 있는가?
 
-구분할 수 없다면 다음으로 가장 값싼 evidence를 선택한다.
+구분할 수 없다면 다음으로 가장 값싼 증거를 선택한다.
 
-이 원칙은 디버깅 비용뿐 아니라 production 안전성을 지킨다.
+이 원칙은 디버깅 비용뿐 아니라 운영 안전성을 지킨다.
 
 ## 8. 어떤 진단을 먼저 선택할까
 
@@ -210,5 +210,5 @@ Agent는 이 요약으로 다음 질문을 선택하고, 필요한 event만 더 
 ### 주요 근거
 
 - [S-PYROSCOPE] Grafana Pyroscope
-- JVM runtime evidence research
+- JVM runtime 증거 research
 - [S-TEMPO-AI] Grafana Tempo and AI

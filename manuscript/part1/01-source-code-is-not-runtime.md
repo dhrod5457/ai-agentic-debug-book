@@ -8,7 +8,7 @@ Coding Agent에게 물어본다.
 
 > 로그인 API가 갑자기 느려졌어. 원인을 찾아줘.
 
-Agent는 저장소를 탐색한다. Controller를 찾고, Service를 따라가고, Repository의 SQL을 읽는다. 몇 가지 가능성을 제시한다.
+Agent는 저장소를 탐색한다. Controller를 찾고, 서비스를 따라가고, Repository의 SQL을 읽는다. 몇 가지 가능성을 제시한다.
 
 - 인덱스 부족
 - N+1
@@ -82,7 +82,7 @@ NullPointerException
 
 이런 경우 Agent는 빠르게 코드 위치로 이동할 수 있다.
 
-하지만 production incident의 상당수는 이렇게 친절하지 않다. 성능 저하는 예외가 없을 수 있다.
+하지만 운영 장애의 상당수는 이렇게 친절하지 않다. 성능 저하는 예외가 없을 수 있다.
 
 ~~~text
 HTTP 200
@@ -173,18 +173,18 @@ Agent도 같은 방식으로 움직여야 한다.
 
 ## 4. 필요한 것은 로그가 아니라 실행 중에 남은 증거다
 
-이 책에서는 Agent가 장애를 조사할 때 사용하는 이런 자료를 편의상 '실행 증거(Runtime Evidence)'라고 부르겠다. 외워야 할 표준 용어는 아니다.
+이 책에서는 Agent가 장애를 조사할 때 사용하는 이런 자료를 편의상 '실행 증거(Runtime 증거)'라고 부르겠다. 외워야 할 표준 용어는 아니다.
 
 실행 증거에는 로그만 들어가지 않는다.
 
 - Logs는 무슨 사건이 기록됐는지 보여준다.
 - Metrics는 언제, 어디서, 얼마나 문제가 커졌는지 보여준다.
-- Traces는 request가 어떤 service와 operation을 지나갔는지 보여준다.
+- Traces는 요청가 어떤 서비스와 operation을 지나갔는지 보여준다.
 - Profiles는 CPU, allocation, lock time이 어디서 쓰였는지 보여준다.
 - JVM diagnostics는 GC, thread, lock 같은 내부 실행 상태를 보여준다.
-- Database evidence는 query, pool, lock/wait 같은 DB 경계의 사실을 보여준다.
-- Platform evidence는 Pod, Node, deployment 상태를 보여준다.
-- Artifact identity는 이 모든 evidence가 어떤 실행 버전에서 발생했는지 알려준다.
+- Database 증거는 조회, pool, lock/wait 같은 DB 경계의 사실을 보여준다.
+- Platform 증거는 Pod, Node, 배포 상태를 보여준다.
+- Artifact identity는 이 모든 증거가 어떤 실행 버전에서 발생했는지 알려준다.
 
 이 중 어느 하나가 항상 정답을 주지는 않는다. 핵심은 서로 연결할 수 있다는 데 있다.
 
@@ -223,7 +223,7 @@ CPU ↑
 
 CPU가 원인일 수도 있고 긴 retry loop 때문에 결과적으로 CPU가 올라간 것일 수도 있다.
 
-그래서 Agent가 'CPU가 상승했으므로 CPU 부족이 root cause입니다'라고 말하면 위험하다. 관측과 추론이 섞였기 때문이다.
+그래서 Agent가 'CPU가 상승했으므로 CPU 부족이 원인입니다'라고 말하면 위험하다. 관측과 추론이 섞였기 때문이다.
 
 더 나은 구조는 다음과 같다.
 
@@ -265,22 +265,22 @@ Running Application
 Agent는 필요할 때 물어야 한다.
 
 - 어느 시간대가 문제인가?
-- 어느 service인가?
-- 정상 request와 느린 request의 차이는 무엇인가?
+- 어느 서비스인가?
+- 정상 요청와 느린 요청의 차이는 무엇인가?
 - 같은 trace의 로그는 무엇인가?
 - 해당 span의 profile은 어떤가?
-- incident 당시 어떤 image가 배포돼 있었는가?
+- 장애 당시 어떤 image가 배포돼 있었는가?
 - 현재 내가 보고 있는 source와 같은 버전인가?
 
-이 질문에 시스템이 machine-readable evidence로 답할 수 있어야 한다.
+이 질문에 시스템이 machine-readable 증거로 답할 수 있어야 한다.
 
 그때부터 Coding Agent는 비로소 애플리케이션을 '본다'고 말할 수 있다.
 
 ## 8. 첫 번째 원칙
 
-> Raw Log ≠ Debug Context
+> Raw Log ≠ Debug 맥락
 
-로그는 Debug Context의 일부일 뿐이다.
+로그는 Debug 맥락의 일부일 뿐이다.
 
 그리고:
 

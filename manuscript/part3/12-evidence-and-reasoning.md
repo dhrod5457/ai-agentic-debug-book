@@ -140,7 +140,9 @@ Grafana MCP 같은 조회 도구
 
 > 찾지 못한 것과 존재하지 않는 것을 구분해야 한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OPENRCA] OpenRCA
 - [S-RCA-REALWORLD-2026] Real-world 관측 데이터 RCA

@@ -39,7 +39,7 @@ POST /checkout 2.8s
  └─ save order 20ms
 ~~~
 
-이제 slow 요청가 어디서 시간을 썼는지 볼 수 있다.
+이제 느린 요청이 어디서 시간을 썼는지 볼 수 있다.
 
 하지만 trace 역시 원인 그 자체는 아니다. external API span이 느린 이유가 network, upstream saturation, retry, DNS, connection pool, timeout configuration 중 무엇인지는 추가 증거가 필요하다.
 
@@ -91,7 +91,7 @@ Thread dump는 deadlock, blocked thread, thread pool starvation을 보여준다.
 
 DB debugging에는 connection acquire, 조회 execute, lock wait, network, pool state, DB resource를 구분해야 한다.
 
-OpenTelemetry의 DB semantic convention도 조회 summary와 조회 text를 구분한다. Agent에게는 low-cardinality 조회 summary와 duration/error를 먼저 주는 편이 안전하다. parameter 값은 기본적으로 숨기는 것이 낫다.
+OpenTelemetry의 DB semantic convention도 query summary와 query text를 구분한다. Agent에게는 low-cardinality query summary와 duration/error를 먼저 주는 편이 안전하다. parameter 값은 기본적으로 숨기는 것이 낫다.
 
 ## 7. Platform 증거 — 코드가 문제가 아닐 수 있다
 

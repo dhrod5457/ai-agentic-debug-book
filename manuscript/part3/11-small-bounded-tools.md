@@ -6,13 +6,13 @@ curl도 할 수 있고, kubectl도 할 수 있고, SQL도 실행할 수 있다.
 
 유연하다.
 
-하지만 production에서는 너무 넓다.
+하지만 운영에서는 너무 넓다.
 
 ## 1. 도구가 넓으면 실수 범위도 넓어진다
 
 예를 들어 Agent가 로그를 보기 위해 shell을 쓴다고 하자.
 
-실수로 파일을 지울 수도 있고, 잘못된 서버에 접속할 수도 있고, 너무 넓은 query를 실행할 수도 있다.
+실수로 파일을 지울 수도 있고, 잘못된 서버에 접속할 수도 있고, 너무 넓은 조회를 실행할 수도 있다.
 
 그래서 운영용 디버깅 도구는 목적을 작게 나누는 편이 낫다.
 
@@ -57,7 +57,7 @@ Agent가 매번 '30분만 검색해'라는 지시를 잘 지킬 것이라고 기
 
 - 가장 느린 span
 - error span
-- service 이동
+- 서비스 이동
 - 전체 duration
 
 정도만 주고, 필요할 때 상세 span을 더 본다.
@@ -101,7 +101,7 @@ Prometheus, Loki, Tempo, Pyroscope 쪽은 Grafana MCP가 이미 많은 기능을
 
 ## 8. 범용 Python 도구는 어디에 쓸까
 
-OpenRCA는 Python executor를 이용해 telemetry를 자유롭게 분석한다.
+OpenRCA는 Python executor를 이용해 관측 데이터를 자유롭게 분석한다.
 
 연구나 offline 분석에서는 매우 유연하다.
 

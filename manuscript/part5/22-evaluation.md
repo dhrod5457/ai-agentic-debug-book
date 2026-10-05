@@ -4,7 +4,7 @@ Agent가 디버깅을 잘한다고 말하려면 무엇을 측정해야 할까?
 
 최종 정답률만 보면 부족하다.
 
-우연히 맞힐 수도 있고, 너무 많은 로그를 읽고 비싼 query를 남발할 수도 있기 때문이다.
+우연히 맞힐 수도 있고, 너무 많은 로그를 읽고 비싼 조회를 남발할 수도 있기 때문이다.
 
 ## 1. 네 가지 조건을 비교한다
 
@@ -26,21 +26,21 @@ D. C + 디버깅 순서와 기록 규칙
 
 가장 기본적인 지표다.
 
-- root cause component
-- root cause reason
+- 원인 component
+- 원인 reason
 
 둘을 나눠 볼 수 있다.
 
 ## 3. 제대로 고쳤는가
 
-원인을 맞혀도 patch가 틀릴 수 있다.
+원인을 맞혀도 수정가 틀릴 수 있다.
 
 그래서 다음도 본다.
 
-- correct patch
+- correct 수정
 - reproduction success
 - regression test
-- incident signal 개선
+- 장애 signal 개선
 
 ## 4. 필요한 증거를 실제로 봤는가
 
@@ -50,22 +50,22 @@ Agent가 connection pool 문제를 맞혔지만 pool metric도 trace도 보지 �
 
 ## 5. 얼마나 많이 읽었는가
 
-같은 정답이라면 적은 query와 적은 token으로 찾는 쪽이 운영에서 더 낫다.
+같은 정답이라면 적은 조회와 적은 token으로 찾는 쪽이 운영에서 더 낫다.
 
 측정 후보:
 - token
-- query 수
+- 조회 수
 - 반환 데이터 크기
 - scan bytes
 - 진단 단계 수
 
 ## 6. 안전하게 조회했는가
 
-정답을 맞혔더라도 production 전체를 무제한 검색했다면 좋은 시스템이 아니다.
+정답을 맞혔더라도 운영 전체를 무제한 검색했다면 좋은 시스템이 아니다.
 
 그래서 다음도 기록한다.
 
-- 범위 밖 query
+- 범위 밖 조회
 - 너무 넓은 시간 범위
 - 민감정보 노출
 - 불필요한 heap/JFR capture
@@ -94,7 +94,7 @@ Agent가 connection pool 문제를 맞혔지만 pool metric도 trace도 보지 �
 
 예를 들어 같은 connection pool 장애를 네 조건에서 10회씩 실행했다고 하자.
 
-| 조건 | 원인 진단 | 올바른 수정 | 같은 신호로 재검증 | 평균 query 수 |
+| 조건 | 원인 진단 | 올바른 수정 | 같은 신호로 재검증 | 평균 조회 수 |
 |---|---:|---:|---:|---:|
 | A. 소스만 | 3/10 | 2/10 | 1/10 | 0 |
 | B. 소스 + raw logs | 5/10 | 3/10 | 1/10 | 0 |
@@ -103,9 +103,9 @@ Agent가 connection pool 문제를 맞혔지만 pool metric도 trace도 보지 �
 
 이런 결과가 나왔다면 단순히 D가 최고라고 끝내지 않는다.
 
-C와 D의 원인 진단률이 같다면 조사 순서를 강제한 효과는 진단 정확도보다 **검증률과 query 효율**에서 나타났다고 해석할 수 있다.
+C와 D의 원인 진단률이 같다면 조사 순서를 강제한 효과는 진단 정확도보다 **검증률과 조회 효율**에서 나타났다고 해석할 수 있다.
 
-반대로 D가 query 수는 줄였지만 정답률도 낮아졌다면 제한이 지나쳤을 수 있다.
+반대로 D가 조회 수는 줄였지만 정답률도 낮아졌다면 제한이 지나쳤을 수 있다.
 
 평가는 설계를 칭찬하기 위한 숫자가 아니라 어디가 실제로 도움이 됐는지 찾는 도구다.
 
@@ -125,4 +125,4 @@ Agent 실행은 변동성이 있다.
 
 - [S-OPENRCA] OpenRCA
 - [S-BTS-AGENTBENCH] BTS-AgentBench
-- [S-RCA-REALWORLD-2026] Real-world Telemetry RCA
+- [S-RCA-REALWORLD-2026] Real-world 관측 데이터 RCA

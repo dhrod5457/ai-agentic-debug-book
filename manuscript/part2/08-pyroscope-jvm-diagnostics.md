@@ -2,7 +2,7 @@
 
 Trace는 한 span이 2초 걸렸다는 사실을 알려준다.
 
-하지만 그 2초 동안 CPU를 썼는지, lock에서 기다렸는지, allocation과 GC가 문제였는지는 별도 evidence가 필요하다.
+하지만 그 2초 동안 CPU를 썼는지, lock에서 기다렸는지, allocation과 GC가 문제였는지는 다른 자료가 더 필요하다.
 
 이때 profile과 JVM diagnostic이 등장한다.
 
@@ -84,7 +84,7 @@ none
 
 필요하면 해당 stack group의 full frames를 확장한다.
 
-## 5. Heap dump는 마지막 단계에 가깝다
+## 5. Heap dump는 정말 필요할 때만 쓴다
 
 Memory leak를 의심한다고 바로 heap dump부터 뜨는 것은 좋지 않다.
 
@@ -92,7 +92,7 @@ Memory leak를 의심한다고 바로 heap dump부터 뜨는 것은 좋지 않�
 
 heap dump는 크고 민감하며 production pause와 저장 비용을 유발할 수 있다.
 
-그래서 Evidence Escalation이 필요하다.
+그래서 가벼운 확인부터 시작해 필요한 경우에만 더 깊은 진단으로 내려가야 한다.
 
 ~~~text
 metrics
@@ -144,7 +144,7 @@ Capture는 별도의 audit와 승인 정책을 둘 수 있다.
 
 그리고:
 
-> Diagnostic Capture와 Diagnostic Read를 분리한다.
+> 이미 있는 진단 자료를 읽는 것과 운영 서버에서 새 진단 자료를 만드는 권한은 나눈다.
 
 여기까지가 Agent가 애플리케이션을 관측하기 위한 핵심 signal stack이다.
 

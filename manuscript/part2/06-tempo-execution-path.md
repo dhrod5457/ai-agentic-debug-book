@@ -56,7 +56,7 @@ Agent 입장에서 중요한 것은 TraceQL 전체 문법을 아는 것이 아�
 
 한 trace에서 이상을 발견했다고 전체 장애의 원인이라고 단정하면 안 된다.
 
-예를 들어 한 trace에서 payment-서비스가 느렸다면 다음 질문이 필요하다.
+예를 들어 한 trace에서 payment-service가 느렸다면 다음 질문이 필요하다.
 
 > 장애 window의 payment span이 전반적으로 느렸는가?
 
@@ -91,15 +91,15 @@ Agent tool에 compare_traces가 유용한 이유다.
 
 ## 6. Tempo가 Agent-native interface를 제공하기 시작했다
 
-2026년 Tempo 공식 문서는 Agent용 MCP endpoint와 LLM-oriented 응답을 제공한다.
+2026년 현재 Tempo는 Agent용 MCP endpoint와 LLM용 간소화 응답을 제공한다. MCP 서버는 Tempo 설정에서 별도로 활성화해야 한다.
 
 이 변화는 중요하다.
 
-관측 시스템 backend가 더 이상 사람의 UI만을 위한 저장소가 아니라 machine reasoning client를 직접 고려하기 시작했다는 뜻이다.
+관측 데이터 저장소가 더 이상 사람의 UI만을 위한 저장소가 아니라 machine reasoning client를 직접 고려하기 시작했다는 뜻이다.
 
 하지만 Tempo MCP가 원인을 보장하는 것은 아니다.
 
-Tempo는 증거를 제공한다. 원인 후보와 수정는 다른 책임이다.
+Tempo는 증거를 제공한다. 원인 후보를 세우고 코드를 수정하는 일은 다른 책임이다.
 
 ## 7. Full trace를 항상 모델에 넣지 않는다
 
@@ -116,7 +116,7 @@ Agent가 먼저 필요한 것은 다음과 같은 summary일 수 있다.
 
 필요할 때 full trace를 확장한다.
 
-원본 trace는 그대로 보관하되, Agent에게는 먼저 필요한 부분만 보여주는 편이 낫다.
+원본 trace는 그대로 보관하되, Agent에게는 먼저 필요한 부분만 보여주는 편이 낫다. LLM용 간소화 응답은 형식이 바뀔 수 있으므로 안정적인 프로그램 연동에는 표준 JSON이나 MCP 인터페이스를 우선한다.
 
 ## 8. 정상 요청과 비교하면 더 빨리 보인다
 
@@ -154,7 +154,7 @@ A 서비스에서는 B를 호출한 흔적이 있는데 B 쪽 span이 보이지 
 
 가능성은 여러 가지다.
 
-- 맥락 propagation이 빠졌다.
+- context propagation이 빠졌다.
 - sampling 정책이 다르다.
 - instrumentation이 누락됐다.
 - 다른 trace로 분리됐다.

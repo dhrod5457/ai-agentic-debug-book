@@ -107,6 +107,21 @@ DB evidence는 low-cardinality summary와 duration/error를 먼저 사용하고 
 ### P15. Platform Evidence Is First-Class
 Kubernetes 장애를 application code 문제로 오인하지 않도록 platform status/event/deployment evidence를 별도 축으로 둔다.
 
+### P16. Raw Logs Are Not Agent Context
+원본 로그 저장과 Agent에게 제공할 debugging context를 분리한다.
+
+### P17. Compress Before Reasoning
+Drain3 같은 template mining, aggregation, 경량 anomaly filtering으로 evidence를 줄인 뒤 LLM reasoning을 수행한다.
+
+### P18. Preserve Correlation Keys
+로그를 정규화하더라도 trace_id, span_id, request_id, service.version 같은 debugging key는 유지한다.
+
+### P19. Cheap Detection, Expensive Reasoning
+상시 탐지는 rule, DeepLog, LogBERT, small Transformer 같은 저비용 계층이 담당하고 LLM은 선택된 evidence에 사용한다.
+
+### P20. Anomaly Is a Retrieval Hint, Not a Root Cause
+anomaly score는 Agent가 조사할 evidence를 좁히는 신호이며 root cause 판정 자체가 아니다.
+
 ## 5. Agent Debug Session Contract 초안
 
 Incident Scope
@@ -169,9 +184,11 @@ HTTP failures → pod restart/status → Kubernetes events → OOM/eviction/conf
 
 ## 7. 다음 조사 우선순위
 
-1. Agent Debug Session Contract를 실제 schema로 설계
-2. Grafana MCP + Kubernetes/JFR tool을 하나의 bounded tool surface로 조합하는 방법
-3. JFR parser/CLI/OSS 중 Agent-friendly summary 생성 도구 조사
-4. DB execution plan/slow-query OSS 및 query sanitization 조사
-5. 대표 Spring Boot failure corpus 설계
-6. Source-only / raw-log / MCP / workflow-layer 비교 실험 설계
+1. Drain3 + DeepLog/LogBERT/small Transformer를 이용한 log evidence reduction 실험
+2. raw log dump와 narrowed log evidence를 LLM Agent에 각각 연결했을 때 token/cost/RCA 정확도 비교
+3. Agent Debug Session Contract를 실제 schema로 설계
+4. Grafana MCP + Kubernetes/JFR tool을 하나의 bounded tool surface로 조합하는 방법
+5. JFR parser/CLI/OSS 중 Agent-friendly summary 생성 도구 조사
+6. DB execution plan/slow-query OSS 및 query sanitization 조사
+7. 대표 Spring Boot failure corpus 설계
+8. Source-only / raw-log / MCP / workflow-layer 비교 실험 설계

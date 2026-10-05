@@ -153,7 +153,9 @@ login-서비스만 조사하는 Agent profile을 생각해보자.
 
 > 읽기 권한, 데이터 범위, 조회 비용, 민감정보를 각각 따로 통제한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-GRAFANA-MCP] Grafana MCP
 - 관측 데이터 governance research

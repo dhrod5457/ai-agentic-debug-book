@@ -118,13 +118,80 @@ Agent가 먼저 필요한 것은 다음과 같은 summary일 수 있다.
 
 원본 trace는 그대로 보관하되, Agent에게는 먼저 필요한 부분만 보여주는 편이 낫다.
 
-## 8. 여섯 번째 원칙
+## 8. 정상 요청과 비교하면 더 빨리 보인다
 
-> Representative execution을 찾고, 그 실행의 critical path를 본다.
+느린 trace 하나만 보면 무엇이 이상한지 감이 안 올 때가 있다.
+
+이럴 때는 같은 API의 정상 trace 하나를 옆에 놓는다.
+
+~~~text
+Normal
+POST /login 180ms
+ └ authenticate 120ms
+    ├ acquireConnection 8ms
+    └ SELECT user 34ms
+
+Slow
+POST /login 3100ms
+ └ authenticate 3000ms
+    ├ acquireConnection 2800ms
+    └ SELECT user 34ms
+~~~
+
+두 trace를 비교하면 차이가 거의 설명 자체가 된다.
+
+SQL 시간은 같다.
+
+connection을 얻는 시간만 달라졌다.
+
+Agent에게 trace 비교 기능이 유용한 이유가 여기 있다.
+
+## 9. trace가 끊겨 있으면 그 자체가 단서다
+
+분산 시스템에서는 trace가 완벽하게 이어진다고 가정하면 안 된다.
+
+A 서비스에서는 B를 호출한 흔적이 있는데 B 쪽 span이 보이지 않을 수 있다.
+
+가능성은 여러 가지다.
+
+- context propagation이 빠졌다.
+- sampling 정책이 다르다.
+- instrumentation이 누락됐다.
+- 다른 trace로 분리됐다.
+
+이때 Agent가 'B 호출은 없었다'고 결론 내리면 안 된다.
+
+trace의 빈 곳도 조사 대상이다.
+
+## 10. trace에서 너무 많은 attribute를 꺼내지 않는다
+
+Span에는 많은 attribute가 들어갈 수 있다.
+
+Agent에게 처음부터 전부 보여주면 오히려 중요한 정보가 묻힌다.
+
+처음에는 다음 정도로 충분할 수 있다.
+
+~~~text
+service
+operation
+duration
+status
+error
+critical path
+version
+~~~
+
+필요할 때 DB, HTTP, messaging attribute를 더 펼친다.
+
+사람이 trace UI에서 span을 하나씩 눌러보는 것과 비슷하다.
+
+## 11. 여섯 번째 원칙
+
+> 실제로 느렸던 요청 하나를 찾아 어디에서 시간이 쓰였는지 본다.
 
 그리고:
 
-> 한 trace에서 발견한 상관관계를 aggregate evidence로 다시 검증한다.
+> 한 요청에서 발견한 이상이 전체 장애에서도 반복되는지 다시 확인한다.
 
 다음 장에서는 같은 trace ID를 사용해 Loki에서 실제 사건 로그를 찾아간다.
 

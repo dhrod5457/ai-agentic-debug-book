@@ -158,7 +158,10 @@ Pod와 Node 상태까지 봤다면 한 가지 질문이 더 남는다.
 
 > Pod와 Node 상태도 코드와 같은 수준의 디버깅 자료로 봐야 한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - Kubernetes runtime 증거 research
-- runtime/source version correlation research
+- [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
+- [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping

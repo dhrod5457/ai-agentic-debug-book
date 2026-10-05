@@ -24,7 +24,7 @@ Grafana MCP는 이 역할을 실제로 제공한다.
 
 중요한 점은 'AI 전용 모니터링 시스템'을 새로 만들지 않아도 된다는 것이다.
 
-이미 운영 중인 observability stack을 Agent가 사용할 수 있게 연결하면 된다.
+이미 운영 중인 관측 시스템 stack을 Agent가 사용할 수 있게 연결하면 된다.
 
 ## 2. Agent는 사람보다 더 쉽게 과하게 조회할 수 있다
 
@@ -70,7 +70,7 @@ Grafana MCP는 우리가 원하는 많은 부분을 이미 해결한다.
 - profile 조회
 - datasource 권한 제한
 - read-only 구성
-- query 범위 제한
+- 조회 범위 제한
 
 이 정도만 있어도 Agent는 소스코드 밖의 실제 운영 정보를 훨씬 잘 볼 수 있다.
 

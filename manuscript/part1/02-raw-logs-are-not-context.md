@@ -16,7 +16,7 @@ application.log 10MB
 → LLM
 ~~~
 
-그런데 production 규모에서는 이 접근이 빠르게 무너진다. 문제는 단순히 context window 크기만이 아니다.
+그런데 운영 규모에서는 이 접근이 빠르게 무너진다. 문제는 단순히 컨텍스트 창 크기만이 아니다.
 
 ## 1. 로그는 실행 단위로 정렬되어 있지 않다
 
@@ -33,11 +33,11 @@ application.log 10MB
 09:10:15 req-A completed
 ~~~
 
-사람이 보더라도 correlation ID가 없다면 읽기 어렵다. 멀티스레드 애플리케이션, 여러 Pod, 여러 service로 가면 로그는 더 뒤섞인다.
+사람이 보더라도 correlation ID가 없다면 읽기 어렵다. 멀티스레드 애플리케이션, 여러 Pod, 여러 서비스로 가면 로그는 더 뒤섞인다.
 
-시간순으로 나열된 텍스트는 causal order가 아니다. 로그를 많이 제공한다고 request boundary가 복원되는 것은 아니다.
+시간순으로 나열된 텍스트는 causal order가 아니다. 로그를 많이 제공한다고 요청 boundary가 복원되는 것은 아니다.
 
-## 2. irrelevant evidence가 추론을 방해한다
+## 2. irrelevant 증거가 추론을 방해한다
 
 운영 로그 대부분은 현재 장애와 무관하다.
 
@@ -54,9 +54,9 @@ unrelated tenant traffic
 
 장애 요청 20줄을 찾기 위해 20만 줄을 넣으면 모델에게는 두 문제가 생긴다. 첫째는 비용이고 둘째는 attention이다.
 
-Context는 storage가 아니다. 모델이 읽을 수 있다고 해서 모든 정보가 같은 중요도로 처리되는 것은 아니다.
+맥락는 storage가 아니다. 모델이 읽을 수 있다고 해서 모든 정보가 같은 중요도로 처리되는 것은 아니다.
 
-OpenRCA가 흥미로운 이유도 여기에 있다. 이 benchmark의 RCA-agent baseline은 방대한 telemetry를 model context에 넣지 않고 Python으로 필요한 부분을 검색하고 분석한다.
+OpenRCA가 흥미로운 이유도 여기에 있다. 이 benchmark의 RCA-agent baseline은 방대한 관측 데이터를 model 맥락에 넣지 않고 Python으로 필요한 부분을 검색하고 분석한다.
 
 데이터는 실행 환경에 남긴다. 모델에는 결과를 가져온다.
 
@@ -92,17 +92,17 @@ source diff
 
 > 모델이 한 번에 읽는 내용과 관측 데이터 전체는 같은 것이 아니다.
 
-Telemetry는 query 가능한 외부 상태로 남겨두는 편이 낫다. Agent는 필요한 evidence만 단계적으로 가져온다.
+관측 데이터는 조회 가능한 외부 상태로 남겨두는 편이 낫다. Agent는 필요한 증거만 단계적으로 가져온다.
 
 ## 4. 로그 전체를 넣으면 시간 범위도 흐려진다
 
-incident가 09:10~09:15에 발생했다고 하자. 그런데 하루치 로그를 모두 넣으면 00:00부터 23:59까지의 사건이 함께 들어간다.
+장애가 09:10~09:15에 발생했다고 하자. 그런데 하루치 로그를 모두 넣으면 00:00부터 23:59까지의 사건이 함께 들어간다.
 
 Agent가 우연히 다른 시간대의 같은 exception을 발견하면 잘못된 가설을 만들 수 있다.
 
 실제 debugging에서는 time range가 매우 중요하다. 그래서 첫 질문은 보통 '언제부터 언제까지 문제가 있었는가?'다.
 
-Agent query에도 같은 제약이 들어가야 한다. Grafana MCP의 Loki guardrail이 최대 effective time range를 두는 이유도 기술적으로 같은 문제와 맞닿아 있다.
+Agent 조회에도 같은 제약이 들어가야 한다. Grafana MCP의 Loki guardrail이 최대 effective time range를 두는 이유도 기술적으로 같은 문제와 맞닿아 있다.
 
 ## 5. 로그 전체는 보안 경계도 무너뜨린다
 
@@ -114,11 +114,11 @@ Agent query에도 같은 제약이 들어가야 한다. Grafana MCP의 Loki guar
 - user ID
 - email
 - DB bind value
-- request body
+- 요청 body
 - internal URL
 - tenant identifier
 
-사람이 Grafana에서 필요한 query만 보는 것과 로그 파일 전체를 외부 모델 context로 보내는 것은 보안적으로 전혀 다른 행위다.
+사람이 Grafana에서 필요한 조회만 보는 것과 로그 파일 전체를 외부 모델 맥락로 보내는 것은 보안적으로 전혀 다른 행위다.
 
 그래서 privacy 문제는 prompt 직전에만 해결할 수 없다. 수집 단계에서부터 redaction과 filtering이 필요하다.
 
@@ -135,7 +135,7 @@ Telemetry Backend
 Agent Query Gateway
 ~~~
 
-저장하면 안 되는 값은 Collector에서 제거한다. 저장된 데이터 중 Agent가 볼 수 있는 범위는 Query Gateway에서 다시 제한한다.
+저장하면 안 되는 값은 Collector에서 제거한다. 저장된 데이터 중 Agent가 볼 수 있는 범위는 조회 Gateway에서 다시 제한한다.
 
 이를 다음처럼 구분할 수 있다.
 
@@ -151,11 +151,11 @@ Agent Query Gateway
 
 버전을 실제로 어떻게 비교하고 어떤 코드를 열어야 하는지는 18장에서 자세히 다룬다.
 
-## 7. Push Context에서 Pull Evidence로
+## 7. Push 맥락에서 Pull 증거로
 
-기존 방식은 telemetry를 모아서 prompt에 넣는 것이다.
+기존 방식은 관측 데이터를 모아서 prompt에 넣는 것이다.
 
-더 나은 방식은 Agent가 telemetry backend에 질문하는 것이다.
+더 나은 방식은 Agent가 관측 데이터 backend에 질문하는 것이다.
 
 ~~~text
 Telemetry Backend
@@ -165,7 +165,7 @@ Telemetry Backend
 Agent
 ~~~
 
-Agent는 먼저 문제 시간대의 login-service p99 latency를 묻는다. 그 결과를 보고 Hikari pending connection을 묻는다. 다음에는 3초 이상 걸린 trace 몇 개를 찾고, 그중 하나의 trace ID로 로그를 검색한다.
+Agent는 먼저 문제 시간대의 login-서비스 p99 latency를 묻는다. 그 결과를 보고 Hikari pending connection을 묻는다. 다음에는 3초 이상 걸린 trace 몇 개를 찾고, 그중 하나의 trace ID로 로그를 검색한다.
 
 이렇게 넓은 현상에서 시작해 필요한 자료만 단계적으로 좁혀간다.
 
@@ -187,7 +187,7 @@ Agent에게 'No errors found'라는 결과가 돌아왔다고 하자.
 
 실제로는 100000 lines 중 앞 1000줄만 반환된 결과라면 결론은 완전히 달라진다.
 
-그래서 tool response에는 query result뿐 아니라 한계도 들어가야 한다.
+그래서 tool response에는 조회 result뿐 아니라 한계도 들어가야 한다.
 
 ~~~text
 sampled=true
@@ -202,15 +202,15 @@ OpenRCA의 Executor도 큰 DataFrame 결과가 잘린 경우 observation bias �
 
 ## 10. 두 번째 원칙
 
-> Model Context ≠ Telemetry Working Set
+> Model 맥락 ≠ 관측 데이터 Working Set
 
 그리고:
 
 > 모든 로그를 밀어 넣기보다 필요한 자료를 그때그때 찾아보는 방식이 확장하기 쉽다.
 
-Agent에게 모든 로그를 읽게 하지 않는다. 대신 scope → aggregate → representative execution → local evidence → source 순서로 필요한 evidence를 가져오게 한다.
+Agent에게 모든 로그를 읽게 하지 않는다. 대신 scope → aggregate → representative execution → local 증거 → source 순서로 필요한 증거를 가져오게 한다.
 
-다음 장에서는 이 evidence가 로그만으로 구성되지 않는 이유를 살펴본다.
+다음 장에서는 이 증거가 로그만으로 구성되지 않는 이유를 살펴본다.
 
 ### 주요 근거
 

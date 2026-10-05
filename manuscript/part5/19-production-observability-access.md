@@ -12,7 +12,7 @@
 
 처음부터 운영 전체를 보여줄 필요는 없다.
 
-예를 들어 login-서비스 장애만 조사한다면 Agent에게 필요한 것은 다음 정도다.
+예를 들어 login-service 장애만 조사한다면 Agent에게 필요한 것은 다음 정도다.
 
 ~~~text
 environment = production
@@ -128,7 +128,7 @@ Agent가 어떤 조회를 실행했는지 남겨야 한다.
 
 ## 10. 작은 운영 예시
 
-login-서비스만 조사하는 Agent profile을 생각해보자.
+login-service만 조사하는 Agent profile을 생각해보자.
 
 ~~~text
 허용
@@ -158,4 +158,4 @@ login-서비스만 조사하는 Agent profile을 생각해보자.
 출처 상세: [References](../references.md)
 
 - [S-GRAFANA-MCP] Grafana MCP
-- 관측 데이터 governance research
+- [S-OTEL-TRANSFORM] OpenTelemetry — Transforming telemetry

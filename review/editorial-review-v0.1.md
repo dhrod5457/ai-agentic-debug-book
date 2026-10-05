@@ -131,3 +131,18 @@
 1. 출간 직전 freshness audit
 2. 오탈자/문장 호흡 최종 교정
 3. 필요 시 PDF/EPUB 등 publication artifact 생성
+
+
+## 10. 출간 직전 교정 결과
+
+완료:
+- 전체 원고 2차 문체 통일
+- 자동 용어 치환 후 발생한 조사/혼용 오류 수동 교정
+- Grafana MCP / Tempo MCP / OpenTelemetry / Spring Boot / Oracle JDK / Kubernetes freshness audit
+- Grafana Loki guardrail default=off 보정
+- Tempo MCP 별도 활성화 및 LLM 응답 형식 안정성 주의 반영
+- References에 확인일/안정성/default 상태 반영
+- 최신 장별 원고에서 BOOK.md 재조립
+- 최종 검사: 22장, References 1개, Source ID 누락 0개, 알려진 자동 치환 패턴 0개
+
+현재 원고는 publication artifact 생성 전 최종 Markdown 기준본으로 사용한다.

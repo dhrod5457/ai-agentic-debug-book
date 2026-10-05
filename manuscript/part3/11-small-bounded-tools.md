@@ -125,7 +125,9 @@ Offline / Sandbox
 
 > 중요한 제한은 prompt가 아니라 도구 자체에서 강제한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-GRAFANA-MCP] Grafana MCP
 - [S-OPENRCA] OpenRCA

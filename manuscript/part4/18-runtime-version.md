@@ -99,7 +99,10 @@ revision 42 error rate 증가
 
 > tag보다 commit과 image digest처럼 바뀌지 않는 식별자가 더 믿을 만하다.
 
-### 주요 근거
+### 참고 자료
 
-- runtime/source version correlation research
+출처 상세: [References](../references.md)
+
+- [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
+- [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping
 - OpenTelemetry 서비스/container semantic conventions

@@ -41,7 +41,7 @@ time = 09:10~09:20
 
 사람 계정을 공유하지 않는다.
 
-Agent용 서비스 account를 따로 만들고 필요한 datasource와 environment만 허용한다.
+Agent 전용 service account를 따로 만들고 필요한 datasource와 environment만 허용한다.
 
 이렇게 하면 Agent가 실수해도 영향 범위를 줄일 수 있다.
 
@@ -104,7 +104,7 @@ Agent가 반복해서 넓은 로그 검색을 하면 관측 시스템 자체가 
 - 조회 timeout
 - 호출 빈도
 
-실제 Grafana MCP의 Loki guardrail이 좋은 참고 사례다.
+실제 Grafana MCP의 Loki guardrail이 좋은 참고 사례다. 현재 기본 모드는 `off`이므로 운영에서는 `enforce` 설정 여부를 명시적으로 확인해야 한다.
 
 ## 8. 결과 크기도 제한한다
 

@@ -113,3 +113,21 @@
 3. 전체 출처 연결 방식 통일
 4. 서문/맺음말 최종 톤 조정
 5. 통합 원고 생성
+
+
+## 9. 문체·References·통합 원고 패스 완료
+
+2026-10-05 추가 편집:
+- 본문 전체에서 어려운 영어 혼용 표현을 2차 정리
+- 코드 블록과 고유 기술 용어는 유지
+- 어색한 자동 치환 표현 수동 교정
+- 장별 `주요 근거`를 `참고 자료`로 통일
+- 내부 연구 메모 이름을 공식 Source ID로 교체
+- `manuscript/references.md` 생성
+- 공식 문서와 peer-reviewed/preprint 구분
+- `manuscript/BOOK.md`에 서문~22장~맺음말~References 통합
+
+현재 다음 단계:
+1. 출간 직전 freshness audit
+2. 오탈자/문장 호흡 최종 교정
+3. 필요 시 PDF/EPUB 등 publication artifact 생성

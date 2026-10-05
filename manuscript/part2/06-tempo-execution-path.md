@@ -97,7 +97,7 @@ Agent tool에 compare_traces가 유용한 이유다.
 
 관측 시스템 backend가 더 이상 사람의 UI만을 위한 저장소가 아니라 machine reasoning client를 직접 고려하기 시작했다는 뜻이다.
 
-하지만 Tempo MCP가 원인를 보장하는 것은 아니다.
+하지만 Tempo MCP가 원인을 보장하는 것은 아니다.
 
 Tempo는 증거를 제공한다. 원인 후보와 수정는 다른 책임이다.
 

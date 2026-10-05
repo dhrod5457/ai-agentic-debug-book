@@ -207,7 +207,9 @@ Agent는 이 요약으로 다음 질문을 선택하고, 필요한 event만 더 
 
 다음 Part에서는 이 signal들을 실제 Agent Tool로 노출할 때 어떤 interface와 policy가 필요한지 살펴본다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-PYROSCOPE] Grafana Pyroscope
 - JVM runtime 증거 research

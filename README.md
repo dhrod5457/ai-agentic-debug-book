@@ -77,7 +77,7 @@ Phase 3 Scope          완료
 Phase 4 TOC            완료
 Phase 5 Chapter Plan   완료
 Phase 6 Draft          1차 초고 완료
-Phase 7 Review         진행 예정
+Phase 7 Review         1차 편집 리뷰 진행 중
 ~~~
 
 ## Research
@@ -85,7 +85,8 @@ Phase 7 Review         진행 예정
 - `research/meta/methodology.md`
 - `research/catalog/source-catalog.md`
 - `research/topics/observability-stack.md`
-- `research/topics/agent-debug-interface.md`
+- `research/design/agent-debug-session-contract-v0.1.md`
+- `research/design/bounded-debug-tool-surface-v0.1.md`
 - `research/topics/papers-and-benchmarks.md`
 - `research/topics/lightweight-log-intelligence.md`
 
@@ -98,11 +99,15 @@ Phase 7 Review         진행 예정
 
 다음 작업은 새 장 추가보다 기존 원고의 품질을 높이는 데 집중합니다.
 
-1. 가독성 리뷰
-2. 어려운 용어와 영어 표현 축소
+1. 가독성 리뷰 — 1차 진행 중
+2. 어려운 용어와 영어 표현 축소 — 1차 진행 중
 3. 장간 중복 제거
-4. 사례 흐름 보강
+4. 사례 흐름 보강 — 후반부 우선 보강 완료
 5. 근거와 출처 연결 점검
 6. 출간용 통합 원고 구성
 
 기준일: 2026-10-05
+
+
+편집 기록:
+- `review/editorial-review-v0.1.md`

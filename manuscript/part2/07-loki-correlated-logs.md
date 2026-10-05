@@ -164,7 +164,9 @@ Agent에게도 숫자와 event key는 유용하고, 개발자에게는 설명 �
 
 다음 장에서는 로그와 trace만으로 부족한 CPU, lock, allocation 문제를 profile과 JVM diagnostics로 내려가 본다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-LOKI-METADATA] Loki Structured Metadata
 - [S-LOKI-조회] Loki 조회 Best Practices

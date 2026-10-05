@@ -77,7 +77,7 @@ Phase 3 Scope          완료
 Phase 4 TOC            완료
 Phase 5 Chapter Plan   완료
 Phase 6 Draft          1차 초고 완료
-Phase 7 Review         1차 편집 리뷰 진행 중
+Phase 7 Review         문체·출처·통합 원고 1차 완료
 ~~~
 
 ## Research
@@ -99,15 +99,22 @@ Phase 7 Review         1차 편집 리뷰 진행 중
 
 다음 작업은 새 장 추가보다 기존 원고의 품질을 높이는 데 집중합니다.
 
-1. 가독성 리뷰 — 1차 진행 중
-2. 어려운 용어와 영어 표현 축소 — 1차 진행 중
-3. 장간 중복 제거
-4. 사례 흐름 보강 — 후반부 우선 보강 완료
-5. 근거와 출처 연결 점검
-6. 출간용 통합 원고 구성
+1. 가독성 리뷰 — 완료
+2. 어려운 용어와 영어 표현 축소 — 완료
+3. 장간 중복 제거 — 1차 완료
+4. 사례 흐름 보강 — 완료
+5. 근거와 출처 연결 점검 — 완료
+6. 출간용 통합 원고 구성 — 완료
 
 기준일: 2026-10-05
 
 
 편집 기록:
 - `review/editorial-review-v0.1.md`
+
+
+## 출간용 원고
+
+- 통합 원고: `manuscript/BOOK.md`
+- References: `manuscript/references.md`
+- 장별 읽기 순서: `manuscript/README.md`

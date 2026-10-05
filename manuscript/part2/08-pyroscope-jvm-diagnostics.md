@@ -54,7 +54,7 @@ Java Flight Recorder는 JVM runtime event를 기록한다.
 - socket I/O
 - file I/O
 
-하지만 JFR도 원본 파일 전체를 model 맥락에 넣는 대상은 아니다.
+하지만 JFR도 원본 파일 전체를 model context에 넣는 대상은 아니다.
 
 장애 window의 event summary나 top contention 같은 projection을 제공하는 편이 낫다.
 
@@ -212,5 +212,5 @@ Agent는 이 요약으로 다음 질문을 선택하고, 필요한 event만 더 
 출처 상세: [References](../references.md)
 
 - [S-PYROSCOPE] Grafana Pyroscope
-- JVM runtime 증거 research
+- [S-ORACLE-JCMD] Oracle JDK 25 — jcmd/JFR
 - [S-TEMPO-AI] Grafana Tempo and AI

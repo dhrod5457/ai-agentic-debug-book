@@ -37,7 +37,7 @@ message=connection timeout
 
 이제 Agent는 trace ID를 기준으로 로그와 실행 경로를 묶어 볼 수 있다.
 
-## 3. service.version을 반드시 남긴다
+## 3. 서비스.version을 반드시 남긴다
 
 운영 장애에서 가장 위험한 실수 중 하나는 다른 버전의 코드를 고치는 것이다.
 
@@ -49,7 +49,7 @@ service.version
 deployment.environment.name
 ~~~
 
-가능하면 image digest와 deployment revision도 함께 둔다.
+가능하면 image digest와 배포 revision도 함께 둔다.
 
 ## 4. HTTP 호출의 trace가 끊기지 않게 한다
 
@@ -63,7 +63,7 @@ A /login
 B /user
 ~~~
 
-하지만 직접 만든 HTTP client 때문에 context propagation이 빠지면 두 trace가 분리된다.
+하지만 직접 만든 HTTP client 때문에 맥락 propagation이 빠지면 두 trace가 분리된다.
 
 Agent는 downstream 호출 자체가 없었던 것처럼 오해할 수 있다.
 
@@ -73,10 +73,10 @@ Agent는 downstream 호출 자체가 없었던 것처럼 오해할 수 있다.
 
 DB 문제를 찾으려면 적어도 다음은 보여야 한다.
 
-- query summary
+- 조회 summary
 - duration
 - error type
-- connection acquire와 query execute의 구분
+- connection acquire와 조회 execute의 구분
 
 특히 connection을 얻는 데 오래 걸린 것과 SQL 실행이 느린 것은 전혀 다른 문제다.
 
@@ -100,7 +100,7 @@ JSON 로그는 Agent에게도 유리하다.
 
 ## 7. 그래도 모든 값을 로그에 넣지 않는다
 
-request body, Authorization header, cookie, SQL parameter 같은 값은 민감할 수 있다.
+요청 body, Authorization header, cookie, SQL parameter 같은 값은 민감할 수 있다.
 
 Agent가 보기 편하다는 이유로 수집 범위를 늘리면 안 된다.
 
@@ -143,5 +143,5 @@ Backend
 
 ### 주요 근거
 
-- [S-SPRING-OBS] Spring Boot Observability
+- [S-SPRING-OBS] Spring Boot 관측 시스템
 - [S-OTEL-LOGS] OpenTelemetry Logging Specification

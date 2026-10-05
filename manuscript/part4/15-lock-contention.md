@@ -164,3 +164,8 @@ OrderLock.acquire hotspot 사라짐
 > CPU가 낮은데 느리다면 계산보다 대기를 먼저 의심해볼 수 있다.
 
 > trace로 위치를 찾고 profile과 thread 정보로 이유를 확인한다.
+
+### 주요 근거
+
+- [S-PYROSCOPE] Grafana Pyroscope
+- JVM runtime evidence research

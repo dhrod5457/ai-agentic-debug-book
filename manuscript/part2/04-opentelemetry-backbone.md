@@ -8,7 +8,7 @@ Agent에게 logs, metrics, traces를 모두 연결한다고 말하면 가장 먼
 
 이 문제를 해결하지 않으면 backend를 몇 개 붙여도 Agent는 여전히 조각난 정보를 본다.
 
-## 1. 먼저 correlation을 설계한다
+## 1. 먼저 같은 요청의 흔적을 서로 연결한다
 
 하나의 로그인 요청을 생각해보자.
 
@@ -26,7 +26,7 @@ Logs에서는 TraceId와 SpanId를 LogRecord에 담아 trace와 연결할 수 �
 
 예를 들면 service.name, service.version, deployment.environment.name 같은 값이다.
 
-Agent 입장에서 이 값들은 단순 metadata가 아니라 Debug Context를 묶는 key다.
+Agent 입장에서 이 값들은 단순한 부가 정보가 아니다. 같은 장애의 자료를 묶어 찾는 기준이 된다.
 
 ## 3. trace_id만 있으면 충분한가
 
@@ -78,7 +78,7 @@ Agentic Debugging에서는 Processor가 특히 중요하다.
 
 즉 Agent에게 telemetry가 도달하기 전에 이미 quality와 security가 결정된다.
 
-## 6. Collection Governance를 먼저 생각한다
+## 6. 저장하기 전에 민감한 정보를 걸러낸다
 
 Agent query layer에서 authorization header를 모델에게 보여주지 말라고 막을 수 있다.
 
@@ -104,7 +104,7 @@ trace sampling은 비용을 줄인다. 하지만 드문 오류 request를 버리
 
 이 때문에 다음을 구분해야 한다.
 
-> Collection Sampling ≠ Retrieval Sampling
+> 무엇을 저장할지 정하는 일과, 저장된 것 중 Agent가 무엇을 볼지 정하는 일은 다르다.
 
 Collection sampling은 무엇을 저장할지 결정한다. Retrieval limit은 저장된 것 중 Agent에게 무엇을 보여줄지 결정한다.
 
@@ -147,7 +147,7 @@ Agent Debug Session Contract
 
 로 책임을 분리하는 편이 낫다.
 
-## 10. correlation은 디버깅의 시작일 뿐이다
+## 10. 정보를 연결하는 것은 디버깅의 시작일 뿐이다
 
 trace와 log가 연결됐다고 root cause가 나온 것은 아니다.
 

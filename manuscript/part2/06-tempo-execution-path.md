@@ -195,7 +195,9 @@ version
 
 다음 장에서는 같은 trace ID를 사용해 Loki에서 실제 사건 로그를 찾아간다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-TEMPO-API] Tempo HTTP API
 - [S-TEMPO-METRICS] Tempo TraceQL Metrics

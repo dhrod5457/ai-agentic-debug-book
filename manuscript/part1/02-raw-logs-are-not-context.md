@@ -143,21 +143,13 @@ Agent Query Gateway
 
 ## 6. 오래된 로그는 현재 코드와 맞지 않을 수 있다
 
-운영 장애 로그는 어제 배포된 이미지에서 발생했고, Agent가 보고 있는 repository는 오늘 main일 수 있다.
+운영 장애가 난 버전과 Agent가 보고 있는 현재 코드가 다를 수 있다.
 
-~~~text
-Incident Runtime
-commit A
+이 사실을 확인하지 않고 stack trace의 line number만 따라가면 엉뚱한 코드를 수정할 수 있다.
 
-Current Workspace
-commit B
-~~~
+그래서 로그와 trace에는 가능하면 실행 버전을 함께 남긴다.
 
-그런데 이 사실을 모른 채 stack trace의 line number만 따라가면 엉뚱한 코드를 수정할 수 있다.
-
-따라서 Debug Context에는 로그뿐 아니라 runtime identity가 필요하다.
-
-최소한 service.name, service.version, deployment.environment, image digest, deployment revision을 확인해야 한다. 가능하면 source commit까지 연결한다.
+버전을 실제로 어떻게 비교하고 어떤 코드를 열어야 하는지는 18장에서 자세히 다룬다.
 
 ## 7. Push Context에서 Pull Evidence로
 
@@ -179,20 +171,15 @@ Agent는 먼저 문제 시간대의 login-service p99 latency를 묻는다. 그 
 
 ## 8. 필요한 자료를 찾는 과정도 무제한이면 안 된다
 
-Pull 방식이라고 자동으로 안전해지는 것은 아니다. Agent가 30일 전체 로그를 검색하도록 놔두면 observability backend 자체에 부담을 줄 수 있다.
+필요한 자료를 그때그때 찾는 방식도 범위를 정하지 않으면 지나치게 넓어질 수 있다.
 
-그래서 한 번에 얼마나 조회할 수 있는지 제한이 필요하다.
+예를 들어 30일 전체 로그를 한 번에 검색하게 두는 것은 좋은 기본값이 아니다.
 
-~~~text
-max_time_range = 30m
-max_scan_bytes = 2GB
-max_log_lines = 1000
-max_traces = 20
-~~~
+여기서는 한 가지 원칙만 기억하면 된다.
 
-실제 Grafana MCP에도 Loki query의 최대 scan bytes와 time range를 제한하고 특정 label matcher를 모든 query에 강제로 추가하는 guardrail이 있다.
+> Agent가 조회할 수 있다고 해서 무제한으로 조회하게 두지는 않는다.
 
-이것은 단순한 성능 최적화가 아니라 Agent interface 설계의 일부다.
+시간 범위, 결과 수, scan 크기 같은 제한은 11장에서 도구 설계와 함께 자세히 다룬다.
 
 ## 9. 결과가 잘렸다면 알려야 한다
 

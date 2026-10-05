@@ -110,7 +110,7 @@ Reason: OOMKilled
 
 ## 3. 사람이 디버깅할 때 이미 하고 있는 일
 
-사람은 이런 문제를 만났을 때 사실상 evidence graph를 만든다.
+사람은 이런 문제를 만났을 때 여러 증거를 서로 연결해서 본다.
 
 로그인 지연 사례를 다시 보자. 개발자는 먼저 Grafana에서 지연시간 증가 시점을 찾는다.
 
@@ -171,11 +171,11 @@ Hypothesis
 
 Agent도 같은 방식으로 움직여야 한다.
 
-## 4. 필요한 것은 로그가 아니라 Runtime Evidence다
+## 4. 필요한 것은 로그가 아니라 실행 중에 남은 증거다
 
-이 책에서는 debugging을 위해 Agent가 사용하는 실행 중 증거를 Application Runtime Evidence라고 부른다. 외부 표준 용어는 아니다.
+이 책에서는 Agent가 장애를 조사할 때 사용하는 이런 자료를 편의상 '실행 증거(Runtime Evidence)'라고 부르겠다. 외워야 할 표준 용어는 아니다.
 
-Runtime Evidence에는 로그만 들어가지 않는다.
+실행 증거에는 로그만 들어가지 않는다.
 
 - Logs는 무슨 사건이 기록됐는지 보여준다.
 - Metrics는 언제, 어디서, 얼마나 문제가 커졌는지 보여준다.
@@ -208,11 +208,11 @@ trace_id = 4f91...
 
 이제 하나의 execution으로 연결할 수 있다.
 
-OpenTelemetry가 중요한 이유도 여기에 있다. TraceId와 SpanId, Resource context를 logs와 traces 사이에 연결할 수 있기 때문이다.
+OpenTelemetry가 중요한 이유도 여기에 있다. 같은 요청에서 나온 로그와 trace를 TraceId와 SpanId로 묶어 볼 수 있기 때문이다.
 
-이 책에서 첫 번째로 강조할 것은 AI 전용 로그 포맷이 아니다. 먼저 제대로 된 correlation이다.
+이 책에서 첫 번째로 강조할 것은 AI 전용 로그 포맷이 아니다. 먼저 같은 실행에서 나온 정보를 제대로 연결하는 것이 중요하다.
 
-## 6. correlation도 root cause는 아니다
+## 6. 같이 보인다고 원인인 것은 아니다
 
 같은 시간에 두 값이 올라갔다고 하나가 다른 하나의 원인이라는 뜻은 아니다.
 
@@ -244,7 +244,7 @@ Next Test
 CPU profile과 container throttling 확인
 ~~~
 
-Evidence는 사실이다. Hypothesis는 해석이다. 이 둘은 시스템 차원에서 분리해야 한다.
+확인한 사실과 원인에 대한 추측은 다르다. 이 둘은 시스템 차원에서 분리해야 한다.
 
 ## 7. Agent에게 애플리케이션을 보여준다는 말의 의미
 
@@ -257,7 +257,7 @@ Source Code
        ↕
 Coding Agent
        ↕
-Runtime Evidence Interface
+실행 정보 조회 도구
        ↕
 Running Application
 ~~~
@@ -286,7 +286,7 @@ Agent는 필요할 때 물어야 한다.
 
 > Source State ≠ Runtime State
 
-코드만 잘 읽는 Agent는 프로그램 구조를 이해할 수 있다. 하지만 장애가 일어난 실행을 이해하려면 실제 runtime evidence가 필요하다.
+코드만 잘 읽는 Agent는 프로그램 구조를 이해할 수 있다. 하지만 장애가 일어난 실행을 이해하려면 실제로 실행 중에 남은 정보가 필요하다.
 
 다음 장에서는 가장 흔한 해결책 하나를 검토한다.
 

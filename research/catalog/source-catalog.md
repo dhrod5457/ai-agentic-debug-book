@@ -228,6 +228,97 @@
 - Principle 후보:
   - deterministic/statistical narrowing과 LLM reasoning을 조합한다.
 
+
+## I. Lightweight Log Intelligence / Evidence Reduction
+
+### [S-DRAIN3] Drain3
+
+- Type: OSS
+- Source: https://github.com/logpai/Drain3
+- 확인점:
+  - streaming log template mining을 수행한다.
+  - variable token을 wildcard/template parameter로 축약한다.
+  - online learning과 inference-only matching을 지원한다.
+  - masking, persistence, parameter extraction 기능이 있다.
+- Agentic Debugging 의미:
+  - raw log를 그대로 LLM에 주기 전에 반복 패턴과 변수 값을 분리하는 evidence reduction 계층으로 사용할 수 있다.
+  - template ID sequence를 경량 anomaly detector 입력으로 사용할 수 있다.
+- 제약:
+  - parsing/template mining 자체는 anomaly detection이나 RCA가 아니다.
+  - trace_id/span_id/service.version 같은 correlation key를 제거하지 않도록 별도 structured field로 보존해야 한다.
+- Principle 후보:
+  - Raw Log ≠ Agent Context
+  - Compress Before Reasoning
+
+### [S-DEEPLOG] DeepLog
+
+- Type: PEER
+- Source: https://doi.org/10.1145/3133956.3134015
+- Venue: CCS 2017
+- 확인점:
+  - LSTM을 사용해 정상 log sequence를 모델링하고 예상 패턴에서 벗어난 sequence를 anomaly로 탐지한다.
+- Agentic Debugging 의미:
+  - 생성형 LLM보다 훨씬 작은 sequence model을 상시 1차 탐지기로 사용할 수 있는 대표 baseline이다.
+- 제약:
+  - anomaly는 root cause가 아니며 최신 Transformer 계열과 직접 성능 비교 시 dataset/전처리 조건을 맞춰야 한다.
+
+### [S-LOGBERT] LogBERT
+
+- Type: PREPRINT / OSS
+- Source: https://arxiv.org/abs/2103.04475
+- Repository: https://github.com/HelenGuohx/logbert
+- 확인점:
+  - self-supervised BERT framework로 정상 log sequence pattern을 학습한다.
+  - 공개 구현은 HDFS, BGL, Thunderbird dataset을 포함한다.
+- Agentic Debugging 의미:
+  - raw log 전체를 LLM에 전달하기 전 sequence anomaly window를 좁히는 경량 Transformer baseline으로 적합하다.
+- 제약:
+  - production OpenTelemetry/Grafana pipeline과 직접 통합된 시스템은 아니다.
+  - anomaly 결과는 retrieval hint이며 RCA 결과가 아니다.
+
+### [S-LOGGPT] LogGPT
+
+- Type: PREPRINT / OSS
+- Source: https://arxiv.org/abs/2309.14482
+- Repository: https://github.com/nokia-steward/LogGPT
+- 확인점:
+  - 이전 log sequence를 기반으로 next log entry를 예측하고 RL fine-tuning으로 anomaly detection을 보강한다.
+- Agentic Debugging 의미:
+  - generative sequence modeling을 이용한 log anomaly detection 비교군으로 사용할 수 있다.
+- 제약:
+  - 상시 lightweight filter 목적에는 DeepLog/LogBERT/small Transformer보다 계산 비용이 클 수 있다.
+
+### [S-LOGLLM] LogLLM
+
+- Type: OSS / RESEARCH
+- Source: https://github.com/guanwei49/LogLLM
+- 확인점:
+  - BERT semantic encoder와 LLM을 결합한 log anomaly detection 구조를 제공한다.
+  - HDFS, BGL, Liberty, Thunderbird dataset 실험 구성을 공개한다.
+- Agentic Debugging 의미:
+  - 모든 로그를 비교적 큰 모델에 직접 처리시키는 접근의 비교 기준으로 사용할 수 있다.
+- 제약:
+  - 1차 상시 필터로는 작은 sequence model보다 자원 비용이 커질 수 있다.
+
+### [S-LOGRAIL] LogRAIL
+
+- Type: PEER / OSS
+- Source: https://github.com/Choiwongwang/LogRAIL
+- Venue: IEEE Access 2026
+- DOI: 10.1109/ACCESS.2026.3688834
+- 확인점:
+  - Stage 1 LogFormer로 전체 window를 scoring한 뒤 near-threshold case만 Vector DB + LLM으로 재검증한다.
+  - 공개 AOSP Android log 결과에서 Stage 1 F1 0.9086, precision-oriented LogRAIL F1 0.9273, recall-oriented F1 0.9248을 보고한다.
+  - Stage 2 LLM은 Llama 3 8B Instruct를 사용한다.
+- Agentic Debugging 의미:
+  - cheap detection → selective expensive reasoning 구조의 직접적인 구현 근거다.
+  - 모든 로그를 LLM에 넣지 않고 애매한 사례만 LLM에 전달하는 설계가 실험적으로 평가되어 있다.
+- 일반화 한계:
+  - 특정 AOSP dataset과 설정의 결과이며 일반 production 환경 성능으로 일반화하면 안 된다.
+- Principle 후보:
+  - Cheap Detection, Expensive Reasoning
+  - Anomaly Is a Retrieval Hint, Not a Root Cause
+
 ## 1차 Synthesis
 
 현재 가장 강한 공통 패턴은 다음과 같다.

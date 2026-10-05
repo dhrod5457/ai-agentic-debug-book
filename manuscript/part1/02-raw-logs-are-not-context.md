@@ -54,9 +54,9 @@ unrelated tenant traffic
 
 장애 요청 20줄을 찾기 위해 20만 줄을 넣으면 모델에게는 두 문제가 생긴다. 첫째는 비용이고 둘째는 attention이다.
 
-맥락는 storage가 아니다. 모델이 읽을 수 있다고 해서 모든 정보가 같은 중요도로 처리되는 것은 아니다.
+맥락은 storage가 아니다. 모델이 읽을 수 있다고 해서 모든 정보가 같은 중요도로 처리되는 것은 아니다.
 
-OpenRCA가 흥미로운 이유도 여기에 있다. 이 benchmark의 RCA-agent baseline은 방대한 관측 데이터를 model 맥락에 넣지 않고 Python으로 필요한 부분을 검색하고 분석한다.
+OpenRCA가 흥미로운 이유도 여기에 있다. 이 benchmark의 RCA-agent baseline은 방대한 관측 데이터를 model context에 넣지 않고 Python으로 필요한 부분을 검색하고 분석한다.
 
 데이터는 실행 환경에 남긴다. 모델에는 결과를 가져온다.
 
@@ -118,7 +118,7 @@ Agent 조회에도 같은 제약이 들어가야 한다. Grafana MCP의 Loki gua
 - internal URL
 - tenant identifier
 
-사람이 Grafana에서 필요한 조회만 보는 것과 로그 파일 전체를 외부 모델 맥락로 보내는 것은 보안적으로 전혀 다른 행위다.
+사람이 Grafana에서 필요한 조회만 보는 것과 로그 파일 전체를 외부 모델 맥락으로 보내는 것은 보안적으로 전혀 다른 행위다.
 
 그래서 privacy 문제는 prompt 직전에만 해결할 수 없다. 수집 단계에서부터 redaction과 filtering이 필요하다.
 
@@ -155,7 +155,7 @@ Agent Query Gateway
 
 기존 방식은 관측 데이터를 모아서 prompt에 넣는 것이다.
 
-더 나은 방식은 Agent가 관측 데이터 backend에 질문하는 것이다.
+더 나은 방식은 Agent가 관측 데이터 저장소에 질문하는 것이다.
 
 ~~~text
 Telemetry Backend
@@ -165,7 +165,7 @@ Telemetry Backend
 Agent
 ~~~
 
-Agent는 먼저 문제 시간대의 login-서비스 p99 latency를 묻는다. 그 결과를 보고 Hikari pending connection을 묻는다. 다음에는 3초 이상 걸린 trace 몇 개를 찾고, 그중 하나의 trace ID로 로그를 검색한다.
+Agent는 먼저 문제 시간대의 login-service p99 latency를 묻는다. 그 결과를 보고 Hikari pending connection을 묻는다. 다음에는 3초 이상 걸린 trace 몇 개를 찾고, 그중 하나의 trace ID로 로그를 검색한다.
 
 이렇게 넓은 현상에서 시작해 필요한 자료만 단계적으로 좁혀간다.
 

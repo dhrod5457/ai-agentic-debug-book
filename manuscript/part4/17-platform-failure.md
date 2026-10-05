@@ -157,3 +157,8 @@ Pod와 Node 상태까지 봤다면 한 가지 질문이 더 남는다.
 > 애플리케이션 장애가 항상 애플리케이션 코드에서 시작되는 것은 아니다.
 
 > Pod와 Node 상태도 코드와 같은 수준의 디버깅 자료로 봐야 한다.
+
+### 주요 근거
+
+- Kubernetes runtime evidence research
+- runtime/source version correlation research

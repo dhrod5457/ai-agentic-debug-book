@@ -157,7 +157,9 @@ acquire 8ms
 
 > 어디에서 기다렸는지 trace로 먼저 구분한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-PROM-API] Prometheus HTTP API
 - [S-TEMPO-API] Tempo HTTP API

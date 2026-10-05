@@ -294,7 +294,9 @@ Agent는 필요할 때 물어야 한다.
 
 그 방식이 왜 작은 데모에서는 동작하고 실제 시스템에서는 무너지는지 살펴보자.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OTEL-LOGS] OpenTelemetry Logging Specification
 - [S-OPENRCA] OpenRCA, ICLR 2025

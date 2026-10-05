@@ -158,7 +158,9 @@ OpenTelemetry는 이 두 작업의 중심에서 logs, metrics, traces, resource 
 
 다음 장부터는 이 correlated 관측 데이터를 실제로 Agent가 어떻게 단계적으로 좁혀가는지 본다. 첫 번째 도구는 Prometheus다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OTEL-LOGS] OpenTelemetry Logging Specification
 - [S-OTEL-COLLECTOR] OpenTelemetry Collector

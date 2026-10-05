@@ -212,7 +212,9 @@ CPU / memory
 
 다음 장에서는 이 concrete execution을 Tempo와 TraceQL로 따라간다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-PROM-API] Prometheus HTTP API
 - [S-PROM-EXEMPLAR] Prometheus Exemplars

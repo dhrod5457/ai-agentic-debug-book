@@ -171,3 +171,8 @@ patch
 > 처음 문제를 발견한 신호를 수정 후 다시 본다.
 
 > 테스트 통과와 장애 해결은 같은 말이 아니다.
+
+### 주요 근거
+
+- [S-OPENRCA] OpenRCA
+- [S-BTS-AGENTBENCH] BTS-AgentBench

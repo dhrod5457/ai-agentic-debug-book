@@ -24,7 +24,7 @@ OpenTelemetry의 강점은 특정 backend가 아니다. Instrumentation과 관�
 
 Logs에서는 TraceId와 SpanId를 LogRecord에 담아 trace와 연결할 수 있다. Resource는 서비스와 runtime에 대한 공통 맥락를 표현한다.
 
-예를 들면 서비스.name, 서비스.version, 배포.environment.name 같은 값이다.
+예를 들면 service.name, service.version, deployment.environment.name 같은 값이다.
 
 Agent 입장에서 이 값들은 단순한 부가 정보가 아니다. 같은 장애의 자료를 묶어 찾는 기준이 된다.
 
@@ -116,7 +116,7 @@ trace와 log가 어떤 서비스에서 나왔는지만 알아서는 부족할 �
 
 같은 서비스라도 배포 버전이 다르면 코드가 다를 수 있다.
 
-그래서 서비스.version 같은 값을 관측 데이터에 함께 남기면 나중에 운영 실행과 소스코드를 연결하기 쉬워진다.
+그래서 service.version 같은 값을 관측 데이터에 함께 남기면 나중에 운영 실행과 소스코드를 연결하기 쉬워진다.
 
 여기서는 OpenTelemetry가 이런 정보를 함께 실어 나를 수 있다는 점만 기억하자.
 

@@ -10,9 +10,9 @@
 
 ## 1. 가장 작은 권한에서 시작한다
 
-처음부터 production 전체를 보여줄 필요는 없다.
+처음부터 운영 전체를 보여줄 필요는 없다.
 
-예를 들어 login-service 장애만 조사한다면 Agent에게 필요한 것은 다음 정도다.
+예를 들어 login-서비스 장애만 조사한다면 Agent에게 필요한 것은 다음 정도다.
 
 ~~~text
 environment = production
@@ -20,7 +20,7 @@ service = login-service
 time = 09:10~09:20
 ~~~
 
-이 범위를 벗어나는 query는 gateway가 막을 수 있다.
+이 범위를 벗어나는 조회는 gateway가 막을 수 있다.
 
 ## 2. 기본은 읽기 전용이다
 
@@ -35,13 +35,13 @@ time = 09:10~09:20
 
 이 단계에서는 read-only 권한으로 충분하다.
 
-대시보드 수정, alert 변경, restart, deployment 같은 기능은 따로 둔다.
+대시보드 수정, alert 변경, restart, 배포 같은 기능은 따로 둔다.
 
 ## 3. Agent 전용 계정을 쓴다
 
 사람 계정을 공유하지 않는다.
 
-Agent용 service account를 따로 만들고 필요한 datasource와 environment만 허용한다.
+Agent용 서비스 account를 따로 만들고 필요한 datasource와 environment만 허용한다.
 
 이렇게 하면 Agent가 실수해도 영향 범위를 줄일 수 있다.
 
@@ -52,7 +52,7 @@ Agent용 service account를 따로 만들고 필요한 datasource와 environment
 - Authorization header
 - cookie
 - 사용자 식별자
-- request body
+- 요청 body
 - SQL parameter
 - 내부 URL
 
@@ -73,13 +73,13 @@ Agent용 service account를 따로 만들고 필요한 datasource와 environment
 
 도구 연결이 가능하다고 해서 데이터 반출이 자동으로 허용되는 것은 아니다.
 
-## 6. 멀티테넌트라면 tenant 경계를 query에 강제한다
+## 6. 멀티테넌트라면 tenant 경계를 조회에 강제한다
 
 한 고객의 장애를 조사하는 Agent가 다른 고객 로그를 읽어서는 안 된다.
 
 좋은 구조는 Agent가 tenant 조건을 기억하기를 기대하지 않는다.
 
-gateway가 모든 query에 tenant matcher를 붙인다.
+gateway가 모든 조회에 tenant matcher를 붙인다.
 
 ~~~text
 사용자 질문
@@ -101,14 +101,14 @@ Agent가 반복해서 넓은 로그 검색을 하면 관측 시스템 자체가 
 - 최대 시간 범위
 - 최대 scan 크기
 - 최대 결과 수
-- query timeout
+- 조회 timeout
 - 호출 빈도
 
 실제 Grafana MCP의 Loki guardrail이 좋은 참고 사례다.
 
 ## 8. 결과 크기도 제한한다
 
-query는 작아도 결과가 매우 클 수 있다.
+조회는 작아도 결과가 매우 클 수 있다.
 
 그래서 처음에는 요약과 상위 몇 개만 반환하고, Agent가 필요할 때 더 요청하게 할 수 있다.
 
@@ -116,7 +116,7 @@ query는 작아도 결과가 매우 클 수 있다.
 
 ## 9. 감사 기록은 나중에 필요해진다
 
-Agent가 어떤 query를 실행했는지 남겨야 한다.
+Agent가 어떤 조회를 실행했는지 남겨야 한다.
 
 장애가 끝난 뒤 다음을 확인할 수 있어야 한다.
 
@@ -128,7 +128,7 @@ Agent가 어떤 query를 실행했는지 남겨야 한다.
 
 ## 10. 작은 운영 예시
 
-login-service만 조사하는 Agent profile을 생각해보자.
+login-서비스만 조사하는 Agent profile을 생각해보자.
 
 ~~~text
 허용
@@ -156,4 +156,4 @@ login-service만 조사하는 Agent profile을 생각해보자.
 ### 주요 근거
 
 - [S-GRAFANA-MCP] Grafana MCP
-- telemetry governance research
+- 관측 데이터 governance research

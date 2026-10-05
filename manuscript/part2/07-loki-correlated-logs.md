@@ -103,13 +103,64 @@ Agent가 관련 로그를 못 찾았다고 해서 사건이 없었다는 뜻은 
 
 따라서 tool result에는 sampled, truncated, retention, query scope 같은 metadata가 필요하다.
 
-## 7. 일곱 번째 원칙
+## 7. 같은 오류 메시지가 항상 같은 원인은 아니다
 
-> 로그는 전체를 읽는 대상이 아니라 이미 좁혀진 execution을 설명하는 evidence로 사용한다.
+운영 로그에서 자주 보는 실수가 있다.
+
+같은 exception message가 보이면 이전 장애와 같은 원인이라고 생각하는 것이다.
+
+예를 들어 connection timeout이라는 문구는 다음 상황에서 모두 나타날 수 있다.
+
+- DB connection pool 고갈
+- 네트워크 지연
+- DB 장애
+- timeout 설정이 너무 짧음
+
+그래서 로그 문구만 보지 않고 같은 trace의 시간 흐름과 지표를 함께 본다.
+
+로그는 강한 단서지만 단독 판결문은 아니다.
+
+## 8. 로그 패턴을 먼저 묶는 것도 도움이 된다
+
+장애 시간대에 같은 warning이 수천 번 반복되면 원문을 모두 볼 필요는 없다.
+
+먼저 패턴별로 묶어서 볼 수 있다.
+
+~~~text
+connection timeout       1,240
+retry attempt exceeded     380
+cache miss                 96
+~~~
+
+그다음 비정상적으로 늘어난 패턴의 실제 로그 몇 개를 펼친다.
+
+이 방식은 Agent가 반복 로그에 context를 낭비하는 것을 줄인다.
+
+Drain3 같은 log template parser가 이런 전처리의 대표적인 예다.
+
+## 9. 구조화 로그도 사람이 읽을 문장은 남긴다
+
+모든 로그를 key-value만으로 만들면 사람이 보기 불편해질 수 있다.
+
+예를 들어 다음처럼 둘 다 남길 수 있다.
+
+~~~text
+event=connection_acquire_timeout
+pending=37
+message="DB connection을 얻지 못해 요청이 지연되었습니다."
+~~~
+
+Agent에게도 숫자와 event key는 유용하고, 개발자에게는 설명 문장이 유용하다.
+
+관측 시스템을 AI만을 위해 다시 설계할 필요는 없다.
+
+## 10. 일곱 번째 원칙
+
+> 로그는 처음부터 전부 읽기보다, 이미 좁혀진 요청에서 무슨 일이 있었는지 확인하는 데 사용한다.
 
 그리고:
 
-> high-cardinality correlation key와 stream indexing strategy를 분리한다.
+> trace ID처럼 매번 달라지는 값은 검색에 필요하지만, 무조건 Loki label로 만들지는 않는다.
 
 다음 장에서는 로그와 trace만으로 부족한 CPU, lock, allocation 문제를 profile과 JVM diagnostics로 내려가 본다.
 

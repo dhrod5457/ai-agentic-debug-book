@@ -138,9 +138,66 @@ Capture는 별도의 audit와 승인 정책을 둘 수 있다.
 
 이 원칙은 디버깅 비용뿐 아니라 production 안전성을 지킨다.
 
-## 8. 여덟 번째 원칙
+## 8. 어떤 진단을 먼저 선택할까
 
-> Dump를 Context로 착각하지 않는다.
+문제 유형에 따라 다음에 볼 자료가 달라진다.
+
+CPU가 높다면 CPU profile이 먼저다.
+
+CPU는 낮은데 latency가 높다면 wall profile이나 thread state가 더 유용할 수 있다.
+
+memory가 계속 증가한다면 heap 사용량과 allocation profile을 먼저 본다.
+
+~~~text
+CPU 높음
+→ CPU profile
+
+CPU 낮음 + latency 높음
+→ wall profile / thread
+
+memory 증가
+→ allocation / GC
+
+deadlock 의심
+→ thread dump
+~~~
+
+이 정도의 작은 선택 규칙만 있어도 Agent가 불필요한 진단을 많이 줄일 수 있다.
+
+## 9. 진단 자체가 장애를 만들 수 있다는 점을 잊지 않는다
+
+관측 도구는 공짜가 아니다.
+
+상세 JFR 설정이나 heap dump는 CPU, I/O, pause, 저장공간에 영향을 줄 수 있다.
+
+따라서 Agent가 '자료가 더 필요하다'는 이유만으로 무조건 실행하면 안 된다.
+
+다음 질문을 먼저 한다.
+
+> 지금 가진 자료로 원인 후보를 구분할 수 없는가?
+
+구분할 수 없다면 그때 가장 부담이 작은 추가 진단을 선택한다.
+
+## 10. 원본보다 요약을 먼저 본다
+
+Thread dump와 JFR도 로그와 마찬가지다.
+
+Agent에게 원본 수천 줄을 먼저 주지 않는다.
+
+예를 들어 JFR 결과를 이렇게 요약할 수 있다.
+
+~~~text
+GC pause: 정상 범위
+allocation: OrderDto 변환 구간 급증
+lock contention: OrderLock.acquire 집중
+socket timeout: 없음
+~~~
+
+Agent는 이 요약으로 다음 질문을 선택하고, 필요한 event만 더 자세히 볼 수 있다.
+
+## 11. 여덟 번째 원칙
+
+> 큰 dump 파일을 그대로 Agent의 입력으로 넣지 않는다.
 
 그리고:
 

@@ -160,5 +160,5 @@ Pod와 Node 상태까지 봤다면 한 가지 질문이 더 남는다.
 
 ### 주요 근거
 
-- Kubernetes runtime evidence research
+- Kubernetes runtime 증거 research
 - runtime/source version correlation research

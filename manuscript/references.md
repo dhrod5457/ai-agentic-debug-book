@@ -31,13 +31,18 @@
 
 - 유형: 공식 사양
 - URL: https://opentelemetry.io/docs/specs/semconv/db/sql/
+- 확인일: 2026-10-05
 - 사용 위치: db.query.summary, db.query.text, SQL parameter 수집과 민감정보 처리
+- 현재 안정성: db.query.summary와 db.query.text는 Stable / Recommended
+- 현재 안정성: db.query.parameter.<key>는 Development / Opt-In
 
 ### [S-OTEL-SERVICE] OpenTelemetry — Service semantic conventions
 
 - 유형: 공식 사양
 - URL: https://opentelemetry.io/docs/specs/semconv/resource/service/
+- 확인일: 2026-10-05
 - 사용 위치: service.name, service.version, service.instance.id
+- 현재 안정성: service.name은 Stable / Required, service.version은 Stable / Recommended
 
 ### [S-OTEL-K8S] OpenTelemetry — Specify resource attributes using Kubernetes annotations
 
@@ -85,7 +90,11 @@
 
 - 유형: 공식 문서 / 오픈소스
 - URL: https://grafana.com/docs/tempo/latest/introduction/tempo-and-ai/
-- 사용 위치: Tempo MCP, Agent용 trace 조회, LLM-oriented 응답
+- MCP server: https://grafana.com/docs/tempo/latest/api_docs/mcp-server/
+- 확인일: 2026-10-05
+- 사용 위치: Tempo MCP, Agent용 trace 조회, LLM용 간소화 응답
+- 현재 주의: MCP server는 설정에서 별도로 활성화해야 한다.
+- 현재 주의: application/vnd.grafana.llm 응답 형식은 변경 가능성이 있어 안정적 프로그램 계약으로 의존하지 않는다.
 
 ### [S-PYROSCOPE] Grafana Pyroscope
 
@@ -97,21 +106,32 @@
 
 - 유형: 공식 문서 / 오픈소스
 - URL: https://grafana.com/docs/grafana/latest/developer-resources/mcp/
+- 설정: https://grafana.com/docs/grafana/latest/developer-resources/mcp/configure/
+- CLI flags: https://grafana.com/docs/grafana/latest/developer-resources/mcp/configure/command-line-flags/
+- Tool/RBAC reference: https://grafana.com/docs/grafana/latest/developer-resources/mcp/reference/mcp-tools-table/
 - 저장소: https://github.com/grafana/mcp-grafana
+- 확인일: 2026-10-05
 - 사용 위치: Prometheus/Loki/Tempo/Pyroscope를 Agent가 직접 조회, read-only와 query guardrail
+- 현재 주의: Loki guardrail mode의 기본값은 off이며 운영 보호 장치로 사용하려면 enforce를 명시해야 한다.
+- 현재 주의: --disable-write는 raw SQL/Influx query 도구도 제거한다.
 
 ### [S-SPRING-OBS] Spring Boot — Observability
 
 - 유형: 공식 문서
 - URL: https://docs.spring.io/spring-boot/reference/actuator/observability.html
+- Tracing: https://docs.spring.io/spring-boot/reference/actuator/tracing.html
+- 확인일: 2026-10-05
 - 사용 위치: Micrometer Observation, tracing, Spring Boot 관측 구성
+- 현재 주의: 자동 network trace propagation에는 auto-configured RestTemplateBuilder, RestClient.Builder, WebClient.Builder 사용이 필요하다.
 - 주의: Spring Boot 버전별 지원 범위를 출간 전 재확인
 
 ### [S-ORACLE-JCMD] Oracle JDK 25 — The jcmd Command
 
 - 유형: 공식 문서
 - URL: https://docs.oracle.com/en/java/javase/25/docs/specs/man/jcmd.html
+- 확인일: 2026-10-05
 - 사용 위치: JFR.start, JFR.check, JFR.dump, JVM 진단 명령과 영향도
+- 현재 상태: JFR.start/check/dump는 Low impact로 문서화되어 있고 heap dump는 High impact로 문서화되어 있다.
 - 주의: JFR.dump의 GC root 경로 수집은 애플리케이션 pause를 유발할 수 있음
 
 ### [S-K8S-EVENT] Kubernetes — Event API

@@ -87,5 +87,6 @@ Phase 7 Review         예정
 - `research/topics/observability-stack.md`
 - `research/topics/agent-debug-interface.md`
 - `research/topics/papers-and-benchmarks.md`
+- `research/topics/lightweight-log-intelligence.md`
 
 기준일: 2026-10-05

@@ -165,7 +165,9 @@ OrderLock.acquire hotspot 사라짐
 
 > trace로 위치를 찾고 profile과 thread 정보로 이유를 확인한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-PYROSCOPE] Grafana Pyroscope
 - JVM runtime 증거 research

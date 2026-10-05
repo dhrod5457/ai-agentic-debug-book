@@ -171,7 +171,9 @@ connection acquire 2.8s
 
 > Agent의 자율성은 운영 변경 권한을 많이 주는 것으로 측정하지 않는다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-GRAFANA-MCP] Grafana MCP
 - JVM runtime 증거 research

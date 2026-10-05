@@ -10,7 +10,7 @@ CPU도 높지 않다. DB도 정상이다. 모든 요청은 결국 200으로 끝�
 
 report API가 평소 300ms 안에 끝나는데 특정 시간대부터 2초가 넘는다.
 
-로그에 예외는 없다. DB query도 대부분 20~30ms다.
+로그에 예외는 없다. DB 조회도 대부분 20~30ms다.
 
 소스코드만 보면 report 생성 로직이 무거워 보인다. Agent도 처음에는 SQL이나 CPU 사용을 의심할 수 있다.
 
@@ -168,4 +168,4 @@ OrderLock.acquire hotspot 사라짐
 ### 주요 근거
 
 - [S-PYROSCOPE] Grafana Pyroscope
-- JVM runtime evidence research
+- JVM runtime 증거 research

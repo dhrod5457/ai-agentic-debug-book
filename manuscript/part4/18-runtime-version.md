@@ -14,7 +14,7 @@ Agent가 현재 main branch를 열어 142번째 줄을 본다.
 
 ## 1. line number를 믿기 전에 버전을 확인한다
 
-먼저 장애 trace나 로그에서 서비스.version을 본다.
+먼저 장애 trace나 로그에서 service.version을 본다.
 
 ~~~text
 service.version = a81c92f
@@ -58,7 +58,7 @@ revision 42 error rate 증가
 
 ## 4. Agent가 해야 할 첫 행동이 바뀐다
 
-버전이 다르면 바로 수정를 만들지 않는다.
+버전이 다르면 바로 수정을 만들지 않는다.
 
 먼저 다음 중 하나를 한다.
 
@@ -89,7 +89,7 @@ revision 42 error rate 증가
 
 ## 7. 수정 후 배포 버전까지 확인한다
 
-수정가 만들어졌다면 실제로 그 수정가 들어간 image가 배포됐는지 확인해야 한다.
+수정이 만들어졌다면 실제로 그 수정이 들어간 image가 배포됐는지 확인해야 한다.
 
 테스트 결과와 운영 결과 사이에도 version 연결이 필요하다.
 

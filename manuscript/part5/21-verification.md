@@ -172,7 +172,9 @@ patch
 
 > 테스트 통과와 장애 해결은 같은 말이 아니다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OPENRCA] OpenRCA
 - [S-BTS-AGENTBENCH] BTS-AgentBench

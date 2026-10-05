@@ -53,12 +53,26 @@
 
 질문:
 - raw telemetry를 어떤 순서로 좁혀야 하는가
-- 대표 trace를 어떻게 선정하는가
+- raw log를 template/sequence 단위로 어떻게 압축하는가
+- deterministic rule과 경량 anomaly model을 어디까지 사용할 것인가
+- 대표 trace와 anomalous log window를 어떻게 선정하는가
 - supporting/contradicting evidence를 어떻게 분리하는가
 - sampled/truncated 결과를 Agent에게 어떻게 알리는가
 
 현재 가설:
-metric anomaly → exemplar/trace → span → logs/profile → source/deploy version
+metric anomaly → exemplar/trace → span → correlated logs → template/sequence anomaly → profile/source/deploy version
+
+핵심 자료:
+- Drain3
+- DeepLog
+- LogBERT
+- LogGPT / LogLLM
+- LogRAIL
+
+설계 원칙:
+- Raw Log ≠ Agent Context
+- anomaly model은 RCA 엔진이 아니라 evidence narrowing 계층이다.
+- 상시 탐지는 저비용 계층이 담당하고 LLM은 좁혀진 evidence를 reasoning한다.
 
 ## R5. Root Cause Reasoning
 
@@ -128,3 +142,5 @@ D. 소스 + correlated multi-signal evidence tools
 6. OpenRCA RCA-agent의 retrieval/tool 구현 분석
 7. deploy version / commit SHA를 OpenTelemetry Resource로 연결하는 사례
 8. patch 전후 telemetry diff를 자동 검증하는 연구와 OSS
+9. Drain3 + DeepLog/LogBERT/small Transformer 기반 경량 log narrowing 실험
+10. raw log → lightweight detector → MCP/tool → LLM Agent 연결 시 token/cost/RCA 정확도 비교

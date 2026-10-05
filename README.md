@@ -71,13 +71,13 @@ Patch Success ≠ Incident Resolution
 ## 현재 단계
 
 ~~~text
-Phase 1 Research       진행 중
-Phase 2 Concept        예정
-Phase 3 Scope          예정
-Phase 4 TOC            예정
-Phase 5 Chapter Plan   예정
-Phase 6 Draft          예정
-Phase 7 Review         예정
+Phase 1 Research       1차 완료
+Phase 2 Concept        완료
+Phase 3 Scope          완료
+Phase 4 TOC            완료
+Phase 5 Chapter Plan   완료
+Phase 6 Draft          1차 초고 완료
+Phase 7 Review         진행 예정
 ~~~
 
 ## Research
@@ -88,5 +88,21 @@ Phase 7 Review         예정
 - `research/topics/agent-debug-interface.md`
 - `research/topics/papers-and-benchmarks.md`
 - `research/topics/lightweight-log-intelligence.md`
+
+기준일: 2026-10-05
+
+
+## 현재 집필 상태
+
+서문, 1~22장, Epilogue까지 1차 초고가 완료되었습니다.
+
+다음 작업은 새 장 추가보다 기존 원고의 품질을 높이는 데 집중합니다.
+
+1. 가독성 리뷰
+2. 어려운 용어와 영어 표현 축소
+3. 장간 중복 제거
+4. 사례 흐름 보강
+5. 근거와 출처 연결 점검
+6. 출간용 통합 원고 구성
 
 기준일: 2026-10-05

@@ -18,7 +18,7 @@ Grafana를 열어 지표를 본다. Prometheus에서 오류율과 지연시간�
 
 > 소스코드만 보는 Coding Agent에게 실제 애플리케이션의 실행 상태를 어떻게 보여줄 것인가?
 
-이 질문을 풀기 위해 새로운 APM을 만들 필요는 없다. 이미 소프트웨어 산업은 오랫동안 관측 시스템 문제를 해결해 왔다. OpenTelemetry는 logs, metrics, traces를 공통 맥락로 연결한다. Prometheus는 metric을 조회한다. Loki는 log를 저장하고 검색한다. Tempo는 distributed trace를 찾는다. Pyroscope는 continuous profile을 제공한다. Grafana는 이 신호들을 사람이 탐색할 수 있게 묶는다.
+이 질문을 풀기 위해 새로운 APM을 만들 필요는 없다. 이미 소프트웨어 산업은 오랫동안 관측 시스템 문제를 해결해 왔다. OpenTelemetry는 logs, metrics, traces를 공통 맥락으로 연결한다. Prometheus는 metric을 조회한다. Loki는 log를 저장하고 검색한다. Tempo는 distributed trace를 찾는다. Pyroscope는 continuous profile을 제공한다. Grafana는 이 신호들을 사람이 탐색할 수 있게 묶는다.
 
 2026년에는 이 경계가 한 단계 더 움직였다. Grafana와 Tempo는 Agent가 관측 데이터를 직접 질의할 수 있는 MCP 인터페이스까지 제공하기 시작했다.
 
@@ -26,9 +26,9 @@ Grafana를 열어 지표를 본다. Prometheus에서 오류율과 지연시간�
 
 > Agent에게 어떤 증거를, 어떤 범위로, 어떤 순서로, 어떤 권한 아래에서 조회하게 해야 하는가?
 
-이 책에서는 이를 Application Runtime 증거라고 부른다. 이 용어는 외부 표준이 아니라 이 책의 설명을 위한 synthesis다.
+이 책에서는 이를 실행 증거(Runtime Evidence)라고 부른다. 이 용어는 외부 표준이 아니라 이 책의 설명을 위해 정리한 표현다.
 
-Runtime 증거에는 로그만 들어가지 않는다.
+실행 증거에는 로그만 들어가지 않는다.
 
 ~~~text
 Request
@@ -65,7 +65,7 @@ Artifact
   └─ source commit
 ~~~
 
-이 정보는 모두 같은 가치와 비용을 가지지 않는다. Prometheus metric 조회는 저렴하지만 heap dump는 비싸다. trace는 요청 path를 보여주지만 원인를 자동으로 알려주지는 않는다. Kubernetes Event는 힌트지만 canonical truth가 아니다. SQL text는 유용하지만 parameter에는 개인정보가 들어갈 수 있다.
+이 정보는 모두 같은 가치와 비용을 가지지 않는다. Prometheus metric 조회는 저렴하지만 heap dump는 비싸다. trace는 요청 경로를 보여주지만 원인를 자동으로 알려주지는 않는다. Kubernetes Event는 힌트지만 canonical truth가 아니다. SQL text는 유용하지만 parameter에는 개인정보가 들어갈 수 있다.
 
 그래서 이 책은 "더 많은 정보"보다 "더 좋은 관측 인터페이스"를 설계하는 데 집중한다.
 
@@ -86,6 +86,6 @@ Test Pass ≠ Incident Resolution
 
 소스코드는 프로그램이 무엇을 하도록 작성되었는지를 보여준다.
 
-Runtime 증거는 프로그램이 실제로 무엇을 했는지를 보여준다.
+실행 증거는 프로그램이 실제로 무엇을 했는지를 보여준다.
 
 Agentic Debugging은 이 두 세계를 연결하는 일에서 시작한다.

@@ -1,273 +1,164 @@
-# Table of Contents v0.1
+# 목차 v0.2
 
 기준일: 2026-10-05
 
-## 책의 질문
+## 이 책이 묻는 질문
 
 > 소스코드만 보는 Coding Agent에게 실제 애플리케이션의 실행 상태를 어떻게 보여줄 것인가?
 
-이 책은 "AI가 알아서 디버깅하게 만드는 프롬프트"를 다루지 않는다.
+이 책은 AI에게 로그를 많이 넣는 방법을 설명하지 않는다.
 
-대신 다음 문제를 다룬다.
-
-- 어떤 runtime evidence를 수집해야 하는가
-- logs, metrics, traces, profiles를 어떻게 하나의 사건으로 연결하는가
-- Agent에게 무엇을 그대로 주고 무엇을 query하게 할 것인가
-- Grafana, Prometheus, Loki, Tempo 같은 기존 오픈소스를 어떻게 활용할 것인가
-- production telemetry를 Agent에게 열 때 어떤 권한과 비용 경계를 두어야 하는가
-- root cause를 찾은 뒤 patch와 verification까지 어떻게 닫힌 loop로 연결할 것인가
+대신 사람이 평소 하던 디버깅 과정을 Agent도 따라갈 수 있게 만드는 방법을 다룬다.
 
 ---
 
 # Part I. 로그를 주는 것과 디버깅을 가능하게 하는 것은 다르다
 
 ## 1장. 소스코드만 보는 Agent는 애플리케이션을 모른다
-
-- 코드가 맞는데 운영에서는 왜 실패하는가
-- source state와 runtime state의 차이
+- 코드와 실제 실행 상태는 다르다
 - stack trace 하나로 충분하지 않은 이유
-- Application Runtime Evidence라는 관점
-- 첫 번째 원칙: Raw Log ≠ Debug Context
+- 같은 요청의 정보를 서로 연결해야 하는 이유
 
 ## 2장. 로그 파일을 통째로 넣으면 왜 실패하는가
-
-- context window는 telemetry storage가 아니다
-- interleaved logs와 causal relation 손실
-- 로그가 많을수록 추론이 좋아진다는 착각
-- token, cost, privacy, stale evidence
-- Model Context ≠ Telemetry Working Set
-- Push Context에서 Pull Evidence로
+- 로그가 많다고 더 잘 찾는 것은 아니다
+- 모델이 읽는 내용과 전체 관측 데이터는 다르다
+- 모든 로그를 넣기보다 필요한 자료를 찾아보게 한다
 
 ## 3장. 디버깅 증거는 한 종류가 아니다
-
-- logs
-- metrics
-- traces
-- exceptions
-- profiles
-- DB evidence
-- JVM diagnostics
-- Kubernetes/platform evidence
-- deployment/source identity
-- Evidence Pyramid와 escalation
+- 지표, trace, 로그, profile
+- DB와 JVM 정보
+- Kubernetes와 배포 상태
+- 가벼운 확인부터 깊은 진단까지
 
 ---
 
-# Part II. Observability를 Agent의 눈과 귀로 바꾼다
+# Part II. 관측 시스템을 Agent의 눈과 귀로 바꾼다
 
 ## 4장. OpenTelemetry를 상관관계의 뼈대로 사용한다
-
-- traceId/spanId/resource
-- log-trace correlation
-- context propagation
-- Collector의 역할
-- filtering, redaction, sampling
-- correlation이 causation은 아닌 이유
+- 같은 요청의 로그와 trace 연결
+- Spring Boot에서 trace 전파
+- Collector에서 filtering과 민감정보 처리
+- 실행 버전도 함께 남긴다
 
 ## 5장. Prometheus로 문제 공간을 먼저 줄인다
-
-- metrics가 답이 아니라 범위 축소 도구인 이유
-- RED signals
-- PromQL과 machine-readable API
-- exemplars
-- anomaly에서 representative execution으로
-- bounded query
+- 언제, 어느 서비스가 이상한지 확인
+- 평소 값과 비교
+- 지표에서 실제 느린 요청으로 내려가기
 
 ## 6장. Tempo로 실제 실행 경로를 따라간다
+- 느린 요청 하나 찾기
+- 어디에서 시간이 쓰였는지 확인
+- 정상 요청과 느린 요청 비교
+- trace가 끊긴 경우도 단서로 보기
 
-- trace와 span
-- TraceQL
-- trace-derived metrics
-- representative trace
-- trace diff
-- distributed failure에서 causal path 찾기
-- Tempo MCP와 LLM-oriented representation
+## 7장. Loki에서 같은 실행의 로그를 찾는다
+- trace ID로 로그 범위 줄이기
+- 반복 로그를 패턴으로 묶어 보기
+- 긴 stack trace는 필요한 만큼만 펼치기
 
-## 7장. Loki에서 같은 execution의 로그를 찾는다
-
-- label과 structured metadata
-- trace_id를 label로 쓰면 안 되는 이유
-- LogQL
-- query range와 scan budget
-- stack trace projection
-- raw log보다 event evidence
-
-## 8장. Pyroscope와 JVM diagnostics로 더 깊이 내려간다
-
-- continuous profiling
-- trace-to-profile
-- JFR
-- thread dump
-- heap dump
-- Evidence Escalation
-- Capture Authority ≠ Read Authority
+## 8장. Pyroscope와 JVM 진단으로 더 깊이 내려간다
+- CPU를 쓰는지 기다리는지 구분
+- profile과 trace 연결
+- JFR과 thread dump
+- heap dump는 정말 필요할 때만 사용
 
 ---
 
-# Part III. Observability API를 Agent Debug Interface로 만든다
+# Part III. 관측 데이터를 Agent가 직접 조회하게 만든다
 
 ## 9장. Grafana MCP는 어디까지 해결해 주는가
+- Agent가 metrics, logs, traces를 직접 조회
+- 읽기 전용과 조회 제한
+- Grafana MCP가 해결하지 않는 디버깅 절차
 
-- Grafana MCP의 실제 tool surface
-- Prometheus/Loki/Tempo/Pyroscope 연결
-- read-only
-- RBAC
-- Loki query guardrail
-- Capability ≠ Query ≠ Mutation
-- 범용 MCP가 해결하지 않는 것
+## 10장. Agent가 디버깅할 때 꼭 기억해야 할 것
+- 문제 범위
+- 운영 버전
+- 무엇을 확인했는지 기록
+- 사실과 추측 분리
+- 재현과 재검증
 
-## 10장. Agent Debug Session Contract
+## 11장. Agent에게 주는 도구는 작고 제한적이어야 한다
+- 강력한 shell 하나보다 작은 전용 도구
+- 시간 범위와 결과 크기 제한
+- JVM/Kubernetes 권한 분리
 
-- incident scope
-- runtime identity
-- evidence budget
-- evidence provenance
-- hypothesis
-- contradicting evidence
-- reproduction
-- patch
-- verification
-- No Evidence, No Claim
-
-## 11장. Agent에게 주는 Tool은 작고 제한적이어야 한다
-
-- query_metric
-- search_traces
-- get_logs_by_trace
-- get_profile_for_span
-- get_k8s_events
-- capture_jfr_window
-- arbitrary shell/python의 장단점
-- bounded tool surface
-- query budget과 audit
-
-## 12장. Evidence와 추론을 분리한다
-
-- correlation과 root cause
-- supporting evidence
-- contradicting evidence
-- unknowns
-- retrieval miss와 reasoning error
-- OpenRCA가 보여주는 구조
-- lucky diagnosis를 구분하는 방법
+## 12장. 로그를 찾았다고 원인을 찾은 것은 아니다
+- 같이 나타난 것과 원인 구분
+- 여러 원인 후보를 하나씩 시험
+- 반대 증거도 확인
+- 찾지 못한 것과 없는 것을 구분
 
 ---
 
 # Part IV. Spring Boot 애플리케이션을 실제로 디버깅한다
 
 ## 13장. Spring Boot에 Agent가 읽을 수 있는 흔적을 남긴다
-
-- Micrometer Observation
-- tracing
-- MDC
-- structured JSON logging
+- traceId/spanId
+- 구조화 로그
+- DB span
+- JVM 지표
 - service.version
-- deployment identity
-- HTTP client context propagation
-- DB spans
-- 최소 instrumentation
 
-## 14장. DB Connection Pool Exhaustion을 찾는다
-
-- symptom
-- Prometheus
-- exemplar
-- Tempo
-- Hikari metrics
-- Loki
-- 잘못된 slow SQL 가설 제거
-- patch와 before/after verification
+## 14장. DB Connection Pool이 바닥났을 때
+- SQL timeout을 보고도 SQL부터 고치지 않는 이유
+- Hikari 지표와 trace
+- 긴 transaction 찾기
+- 같은 부하로 재검증
 
 ## 15장. Lock Contention은 로그만으로 보이지 않는다
-
-- low CPU, high latency
-- slow trace
+- CPU는 낮은데 latency가 높은 경우
 - wall profile
-- JFR/thread evidence
-- expensive evidence escalation
-- source location으로 연결
+- thread dump와 JFR
+- 전역 lock 수정과 재검증
 
-## 16장. N+1은 느린 SQL 한 개가 아니다
-
-- db.query.summary
-- span multiplicity
-- sanitized SQL
-- parameters default deny
-- query count와 request size correlation
-- patch verification
+## 16장. N+1은 느린 SQL 하나가 아니다
+- 한 요청의 SQL 반복 횟수 보기
+- query summary
+- 민감한 parameter 없이도 원인 찾기
 
 ## 17장. 장애가 코드가 아닐 때
-
-- Pod restart
-- OOMKilled
-- eviction
-- failed scheduling
-- Kubernetes Events의 한계
-- rollout revision
-- image digest
-- platform evidence를 first-class로 다루기
+- Pod restart와 OOMKilled
+- eviction과 Node pressure
+- Kubernetes Event와 resource metric 함께 보기
 
 ## 18장. 이미 다른 버전이 운영 중이라면
-
 - service.version
 - image digest
 - deployment revision
-- commit SHA
-- current workspace와 incident runtime 비교
-- stale incident와 wrong-version patch
+- 현재 저장소와 운영 버전 비교
 
 ---
 
-# Part V. Production Agentic Debugging
+# Part V. 운영 환경에서 안전하게 연결한다
 
-## 19장. Production Telemetry를 Agent에게 열어도 되는가
+## 19장. 운영 관측 데이터를 Agent에게 열어도 되는가
+- 최소권한
+- Agent 전용 계정
+- tenant 범위
+- 민감정보와 외부 LLM
+- query 비용과 감사 기록
 
-- read-only baseline
-- tenant/environment scope
-- service account
-- RBAC
-- redaction
-- secret/PII
-- query cost
-- audit
-
-## 20장. Root Cause에서 Patch로 넘어갈 때 경계가 바뀐다
-
-- observation authority
-- diagnostic capture authority
-- development mutation
-- production mutation
-- approval
-- sandbox
-- rollback
+## 20장. 원인을 찾은 뒤부터는 권한이 달라진다
+- 읽기와 진단 자료 생성
+- 로컬 수정과 운영 수정
+- 임시 완화와 근본 수정
+- 승인과 rollback
 
 ## 21장. 수정했다고 끝난 것이 아니다
+- 같은 workload로 다시 확인
+- 올바른 버전이 배포됐는지 확인
+- 처음 장애 신호를 다시 보기
+- 부분 해결도 기록
 
-- reproduction
-- same-signal verification
-- before/after telemetry
-- regression
-- residual anomaly
-- incident resolution과 test pass의 차이
-
-## 22장. Agentic Debugging을 평가하는 방법
-
-- Source only
-- Raw logs
-- Observability MCP
-- Debug Workflow Layer
-- outcome score
-- process score
-- evidence precision/recall
-- cost/safety metrics
-- replayability
-- benchmark limitations
+## 22장. Agentic Debugging을 어떻게 평가할까
+- 소스만 제공한 경우와 비교
+- raw logs와 관측 도구 비교
+- 정답뿐 아니라 증거·비용·안전성 평가
+- 반복 실행과 실패 원인 분류
 
 ---
 
-# Epilogue. Agent에게 더 많은 로그가 아니라 더 좋은 관측 인터페이스를 준다
+# 맺으며. 더 많은 로그보다 더 좋은 관측 인터페이스
 
-최종 메시지:
-
-> Agent가 디버깅을 잘하도록 만드는 핵심은 모든 정보를 prompt에 넣는 것이 아니다.
-> 실행 중인 시스템에서 필요한 증거를 안전하게 찾고, 연결하고, 검증할 수 있는 인터페이스를 만드는 것이다.
+> Agent에게 모든 정보를 넣는 것이 아니라, 필요한 증거를 안전하게 찾고 확인할 수 있는 길을 만들어야 한다.

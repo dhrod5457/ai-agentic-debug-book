@@ -170,4 +170,4 @@ OrderLock.acquire hotspot 사라짐
 출처 상세: [References](../references.md)
 
 - [S-PYROSCOPE] Grafana Pyroscope
-- JVM runtime 증거 research
+- [S-ORACLE-JCMD] Oracle JDK 25 — jcmd/JFR

@@ -4,7 +4,7 @@
 
 먼저 범위를 줄여야 한다.
 
-어느 service가 문제인지, 언제 시작됐는지, error인지 latency인지, 특정 endpoint인지 전체 시스템인지부터 알아야 한다.
+어느 서비스가 문제인지, 언제 시작됐는지, error인지 latency인지, 특정 endpoint인지 전체 시스템인지부터 알아야 한다.
 
 Prometheus는 이 단계에 잘 맞는다.
 
@@ -12,7 +12,7 @@ Prometheus는 이 단계에 잘 맞는다.
 
 예를 들어 로그인 지연이 보고됐다.
 
-Agent가 처음부터 login-service 로그 10만 줄을 읽는 대신 다음을 확인한다.
+Agent가 처음부터 login-서비스 로그 10만 줄을 읽는 대신 다음을 확인한다.
 
 ~~~text
 request rate
@@ -32,9 +32,9 @@ Metric은 답을 주지 않았지만 무엇을 다음에 볼지 정해줬다.
 
 ## 2. Agent에게 Dashboard를 보여줄 필요는 없다
 
-사람은 Grafana graph를 보는 것이 편하다. Agent는 숫자와 구조화된 query result가 더 직접적이다.
+사람은 Grafana graph를 보는 것이 편하다. Agent는 숫자와 구조화된 조회 result가 더 직접적이다.
 
-Prometheus HTTP API는 instant query와 range query를 JSON으로 반환한다.
+Prometheus HTTP API는 instant 조회와 range 조회를 JSON으로 반환한다.
 
 따라서 Agent tool은 다음 정도면 충분할 수 있다.
 
@@ -46,7 +46,7 @@ get_exemplars(query, start, end)
 
 중요한 것은 PromQL 문법보다 tool boundary다.
 
-## 3. Broad query를 허용하면 안 된다
+## 3. Broad 조회를 허용하면 안 된다
 
 Agent가 임의 PromQL을 사용할 수 있다고 해서 무제한 range와 series를 읽게 할 필요는 없다.
 
@@ -54,13 +54,13 @@ Tool gateway는 다음을 제한할 수 있다.
 
 - datasource
 - environment
-- service
+- 서비스
 - time range
 - returned series
 - sample count
-- query timeout
+- 조회 timeout
 
-Agent에게 query capability를 주는 것과 observability backend 전체를 맡기는 것은 다르다.
+Agent에게 조회 capability를 주는 것과 관측 시스템 backend 전체를 맡기는 것은 다르다.
 
 ## 4. Exemplars가 중요한 이유
 
@@ -70,7 +70,7 @@ Metric은 aggregate다.
 p99 = 3.1s
 ~~~
 
-이 값만으로는 어떤 request가 3초 걸렸는지 알 수 없다.
+이 값만으로는 어떤 요청가 3초 걸렸는지 알 수 없다.
 
 Exemplar가 trace ID를 가지고 있으면 aggregate anomaly에서 concrete execution으로 이동할 수 있다.
 
@@ -86,7 +86,7 @@ Representative Trace
 
 이 연결이 Agentic Debugging에서 중요하다.
 
-## 5. anomaly를 root cause로 부르지 않는다
+## 5. anomaly를 원인로 부르지 않는다
 
 Prometheus에서 connection pending이 증가했다고 connection pool이 반드시 원인인 것은 아니다.
 
@@ -107,7 +107,7 @@ slow trace에서 connection acquire span 확인
 
 이 구분을 지켜야 한다.
 
-## 6. Prometheus의 역할은 다음 query를 더 좋게 만드는 것이다
+## 6. Prometheus의 역할은 다음 조회를 더 좋게 만드는 것이다
 
 좋은 investigation은 metric에서 끝나지 않는다.
 
@@ -123,7 +123,7 @@ incident window
 representative trace
 ~~~
 
-즉 Prometheus는 Agent가 다음 evidence를 더 정확하게 찾게 하는 첫 번째 범위 축소 도구다.
+즉 Prometheus는 Agent가 다음 증거를 더 정확하게 찾게 하는 첫 번째 범위 축소 도구다.
 
 ## 7. 사람이라면 그래프를 보고, Agent라면 질문을 남긴다
 

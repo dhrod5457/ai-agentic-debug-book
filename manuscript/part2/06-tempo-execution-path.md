@@ -8,7 +8,7 @@ Metric에서 login-service의 특정 시간대가 문제라는 사실까지 좁�
 
 이 질문에 trace가 답한다.
 
-## 1. Representative Trace를 찾는다
+## 1. 대표적인 느린 요청 하나를 찾는다
 
 모든 trace를 읽을 필요는 없다.
 
@@ -68,7 +68,7 @@ TraceQL metrics나 trace-derived metrics를 사용하면 span 집합을 다시 a
 aggregate
 → trace
 → suspicious span
-→ aggregate verification
+→ 다시 전체 경향 확인
 ~~~
 
 이 왕복이 correlation을 causation으로 오해하는 것을 줄인다.
@@ -116,7 +116,7 @@ Agent가 먼저 필요한 것은 다음과 같은 summary일 수 있다.
 
 필요할 때 full trace를 확장한다.
 
-Canonical trace와 LLM projection을 분리하는 이유다.
+원본 trace는 그대로 보관하되, Agent에게는 먼저 필요한 부분만 보여주는 편이 낫다.
 
 ## 8. 여섯 번째 원칙
 

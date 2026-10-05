@@ -161,4 +161,4 @@ acquire 8ms
 
 - [S-PROM-API] Prometheus HTTP API
 - [S-TEMPO-API] Tempo HTTP API
-- [S-SPRING-OBS] Spring Boot Observability
+- [S-SPRING-OBS] Spring Boot 관측 시스템

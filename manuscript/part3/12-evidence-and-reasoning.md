@@ -73,7 +73,7 @@ trace 연결이 끊겼다
 
 ## 5. OpenRCA가 보여준 중요한 점
 
-OpenRCA에서는 telemetry를 직접 분석하는 Agent가 반복해서 작은 분석을 수행한다.
+OpenRCA에서는 관측 데이터를 직접 분석하는 Agent가 반복해서 작은 분석을 수행한다.
 
 핵심은 모델이 한 번에 정답을 말하는 것이 아니다.
 
@@ -88,7 +88,7 @@ OpenRCA에서는 telemetry를 직접 분석하는 Agent가 반복해서 작은 �
 
 ## 6. 우연히 맞힌 답을 구분해야 한다
 
-Agent가 root cause를 맞혔다.
+Agent가 원인를 맞혔다.
 
 하지만 관련 metric도 trace도 보지 않았다.
 
@@ -143,5 +143,5 @@ Grafana MCP 같은 조회 도구
 ### 주요 근거
 
 - [S-OPENRCA] OpenRCA
-- [S-RCA-REALWORLD-2026] Real-world Telemetry RCA
+- [S-RCA-REALWORLD-2026] Real-world 관측 데이터 RCA
 - [S-BTS-AGENTBENCH] BTS-AgentBench

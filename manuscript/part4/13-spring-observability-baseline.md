@@ -37,7 +37,7 @@ message=connection timeout
 
 이제 Agent는 trace ID를 기준으로 로그와 실행 경로를 묶어 볼 수 있다.
 
-## 3. 서비스.version을 반드시 남긴다
+## 3. service.version을 반드시 남긴다
 
 운영 장애에서 가장 위험한 실수 중 하나는 다른 버전의 코드를 고치는 것이다.
 
@@ -73,7 +73,7 @@ Agent는 downstream 호출 자체가 없었던 것처럼 오해할 수 있다.
 
 DB 문제를 찾으려면 적어도 다음은 보여야 한다.
 
-- 조회 summary
+- query summary
 - duration
 - error type
 - connection acquire와 조회 execute의 구분

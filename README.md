@@ -77,7 +77,7 @@ Phase 3 Scope          완료
 Phase 4 TOC            완료
 Phase 5 Chapter Plan   완료
 Phase 6 Draft          1차 초고 완료
-Phase 7 Review         문체·출처·통합 원고 1차 완료
+Phase 7 Review         출간 직전 교정·freshness audit 완료
 ~~~
 
 ## Research
@@ -118,3 +118,13 @@ Phase 7 Review         문체·출처·통합 원고 1차 완료
 - 통합 원고: `manuscript/BOOK.md`
 - References: `manuscript/references.md`
 - 장별 읽기 순서: `manuscript/README.md`
+
+
+## 출간 직전 상태
+
+- 최종 통합 원고: `manuscript/BOOK.md`
+- References: `manuscript/references.md`
+- Freshness audit: `review/freshness-audit-2026-10-05.md`
+- 최종 구조 검사: 22장 / References 1개 / Source ID 누락 0 / 알려진 자동 치환 오류 0
+
+기준일: 2026-10-05

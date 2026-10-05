@@ -120,3 +120,9 @@ Agent 실행은 변동성이 있다.
 > Agentic Debugging 평가는 정답뿐 아니라 과정, 비용, 안전성, 검증까지 함께 봐야 한다.
 
 > 좋은 디버깅 시스템은 왜 맞았는지를 다시 설명할 수 있어야 한다.
+
+### 주요 근거
+
+- [S-OPENRCA] OpenRCA
+- [S-BTS-AGENTBENCH] BTS-AgentBench
+- [S-RCA-REALWORLD-2026] Real-world Telemetry RCA

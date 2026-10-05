@@ -8,7 +8,7 @@
 
 Prometheus는 이 단계에 잘 맞는다.
 
-## 1. Metric은 root cause보다 scope를 알려준다
+## 1. Metric은 원인보다 먼저 문제 범위를 알려준다
 
 예를 들어 로그인 지연이 보고됐다.
 
@@ -26,7 +26,7 @@ DB pool
 
 그 결과 특정 8분 동안 p99만 급증하고 CPU와 GC는 정상이며 Hikari pending이 늘었다고 하자.
 
-이제 investigation scope가 훨씬 작아졌다.
+이제 어디를 더 봐야 할지가 훨씬 분명해졌다.
 
 Metric은 답을 주지 않았지만 무엇을 다음에 볼지 정해줬다.
 
@@ -92,7 +92,7 @@ Prometheus에서 connection pending이 증가했다고 connection pool이 반드
 
 upstream timeout 때문에 transaction이 길어져 결과적으로 pool이 고갈됐을 수도 있다.
 
-Metric 결과는 hypothesis를 만드는 evidence다.
+지표 결과는 원인 후보를 세우기 위한 근거다.
 
 ~~~text
 Evidence
@@ -123,7 +123,7 @@ incident window
 representative trace
 ~~~
 
-즉 Prometheus는 Agent가 다음 evidence를 더 정확하게 찾게 하는 첫 번째 narrowing layer다.
+즉 Prometheus는 Agent가 다음 evidence를 더 정확하게 찾게 하는 첫 번째 범위 축소 도구다.
 
 ## 7. 다섯 번째 원칙
 

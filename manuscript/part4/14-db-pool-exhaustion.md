@@ -156,3 +156,9 @@ acquire 8ms
 > timeout 로그가 보인다고 SQL부터 고치지 않는다.
 
 > 어디에서 기다렸는지 trace로 먼저 구분한다.
+
+### 주요 근거
+
+- [S-PROM-API] Prometheus HTTP API
+- [S-TEMPO-API] Tempo HTTP API
+- [S-SPRING-OBS] Spring Boot Observability

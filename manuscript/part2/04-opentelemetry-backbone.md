@@ -110,26 +110,17 @@ Collection sampling은 무엇을 저장할지 결정한다. Retrieval limit은 �
 
 예를 들어 error trace와 매우 느린 trace는 tail sampling으로 보존하고, Agent query에서는 그 중 5개만 representative trace로 반환할 수 있다.
 
-## 8. service.version을 잊지 않는다
+## 8. 실행 버전도 같은 흐름에 넣는다
 
-Agentic Debugging에서 OpenTelemetry Resource가 특별히 중요한 이유가 하나 더 있다. runtime과 source를 연결하기 위해서다.
+trace와 log가 어떤 서비스에서 나왔는지만 알아서는 부족할 때가 있다.
 
-~~~text
-service.name = login-service
-service.version = a81c92f
-deployment.environment.name = production
-~~~
+같은 서비스라도 배포 버전이 다르면 코드가 다를 수 있다.
 
-이 값이 trace와 log에 연결돼 있으면 Agent는 현재 workspace와 비교할 수 있다.
+그래서 service.version 같은 값을 관측 데이터에 함께 남기면 나중에 운영 실행과 소스코드를 연결하기 쉬워진다.
 
-~~~text
-runtime a81c92f
-workspace b115e91
-~~~
+여기서는 OpenTelemetry가 이런 정보를 함께 실어 나를 수 있다는 점만 기억하자.
 
-다르다면 바로 patch하지 않는다. 먼저 해당 version의 source를 찾거나 diff를 확인한다.
-
-이 과정은 debugging에서 매우 중요하지만 전통적인 dashboard 중심 observability에서는 쉽게 빠진다.
+실제 incident에서 운영 버전과 현재 workspace를 비교하는 방법은 18장에서 다룬다.
 
 ## 9. Agent-friendly schema를 만들 때 주의할 점
 

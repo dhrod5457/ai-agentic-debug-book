@@ -1818,3 +1818,1456 @@ Agent는 이 요약으로 다음 질문을 선택하고, 필요한 event만 더 
 - [S-PYROSCOPE] Grafana Pyroscope
 - [S-ORACLE-JCMD] Oracle JDK 25 — jcmd/JFR
 - [S-TEMPO-AI] Grafana Tempo and AI
+
+
+---
+
+# Part III. 관측 데이터를 Agent가 직접 조회하게 만든다
+
+# 9장. Grafana MCP는 어디까지 해결해 주는가
+
+지금까지는 사람이 Grafana를 열고 Prometheus, Tempo, Loki, Pyroscope를 따라가며 장애를 찾는 과정을 살펴봤다.
+
+그렇다면 Agent도 같은 데이터를 직접 볼 수 있을까?
+
+이 질문에 가장 현실적인 답 중 하나가 Grafana MCP다.
+
+## 1. 화면을 보여주는 대신 도구를 연결한다
+
+사람은 그래프를 보고 클릭하면서 탐색한다. Agent에게 같은 화면을 보여줄 필요는 없다.
+
+대신 이런 식의 도구를 줄 수 있다.
+
+~~~text
+지표 조회
+로그 검색
+trace 검색
+profile 조회
+대시보드 요약
+~~~
+
+Grafana MCP는 이 역할을 실제로 제공한다.
+
+중요한 점은 'AI 전용 모니터링 시스템'을 새로 만들지 않아도 된다는 것이다.
+
+이미 운영 중인 관측 시스템을 Agent가 사용할 수 있게 연결하면 된다.
+
+## 2. Agent는 사람보다 더 쉽게 과하게 조회할 수 있다
+
+사람은 Grafana에서 대충 10분, 30분 범위를 보고 검색한다.
+
+Agent는 잘못된 지시를 받으면 30일 전체 로그를 검색할 수도 있다.
+
+그래서 Agent에게 조회 기능을 줄 때는 처음부터 제한이 필요하다.
+
+예를 들면:
+
+- 한 번에 볼 수 있는 시간 범위
+- 최대 로그 스캔 크기
+- 조회 가능한 datasource
+- 조회 가능한 environment
+- 쓰기 기능 비활성화
+
+Grafana MCP는 실제로 이런 제한을 둘 수 있다. 다만 Loki 비용 guardrail은 현재 기본 모드가 `off`이므로 운영에서 보호 장치로 쓰려면 `enforce`를 명시적으로 설정해야 한다.
+
+## 3. Grafana MCP에서 읽기 기능만 남길 수 있다
+
+운영 장애를 조사할 때는 대부분 데이터를 보는 것만으로 시작할 수 있다.
+
+Grafana MCP는 쓰기 기능을 끄고 조회 기능만 남기는 구성이 가능하다.
+
+이 장에서는 이것을 제품이 제공하는 안전장치의 한 예로만 보자.
+
+운영에서 읽기, 진단 자료 생성, 실제 변경 권한을 어떻게 나눌지는 20장에서 자세히 다룬다.
+
+## 4. '조회'라는 이름만 믿지는 않는다
+
+SQL처럼 조회 도구처럼 보여도 backend 권한에 따라 데이터를 바꿀 수 있는 기능이 있다.
+
+따라서 read-only는 tool 이름이 아니라 실제 동작과 credential까지 함께 보고 판단해야 한다.
+
+## 5. Grafana MCP가 해주는 것
+
+Grafana MCP는 우리가 원하는 많은 부분을 이미 해결한다.
+
+- metrics 조회
+- logs 검색
+- trace 검색
+- profile 조회
+- datasource 권한 제한
+- read-only 구성
+- 조회 범위 제한
+
+이 정도만 있어도 Agent는 소스코드 밖의 실제 운영 정보를 훨씬 잘 볼 수 있다.
+
+## 6. 그래도 빠져 있는 것이 있다
+
+하지만 Grafana MCP가 디버깅 전체를 대신해 주지는 않는다.
+
+예를 들어 Agent가 로그를 찾았다고 하자.
+
+그 다음 질문은 여전히 남는다.
+
+- 이 로그가 정말 원인인가?
+- 다른 가설은 없는가?
+- 지금 보는 운영 버전과 소스코드 버전이 같은가?
+- 수정 전에 재현했는가?
+- 수정 후 같은 문제가 사라졌는가?
+
+Grafana MCP는 데이터를 가져오는 도구다.
+
+디버깅의 순서를 정하고, 증거를 정리하고, 수정과 검증까지 이어가는 일은 별도 구조가 필요하다.
+
+## 7. 이 책에서 추가하려는 한 겹
+
+그래서 이 책에서는 Grafana MCP 위에 아주 얇은 흐름을 하나 더 둔다.
+
+~~~text
+Grafana MCP
+  ↓
+문제 범위 확인
+  ↓
+필요한 증거 수집
+  ↓
+원인 후보 정리
+  ↓
+수정
+  ↓
+다시 확인
+~~~
+
+이 흐름을 다음 장에서 하나의 디버깅 세션 규칙으로 정리한다.
+
+## 8. 이 장에서 기억할 것
+
+> Grafana MCP는 Agent에게 운영 데이터를 보여주는 좋은 출발점이다.
+
+> 하지만 데이터를 볼 수 있게 하는 것과 디버깅 절차를 만드는 것은 다른 일이다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-GRAFANA-MCP] Grafana MCP
+- [S-TEMPO-AI] Tempo and AI
+
+# 10장. Agent가 디버깅할 때 꼭 기억해야 할 것
+
+사람이 장애를 조사하다 보면 자연스럽게 몇 가지를 메모한다.
+
+언제부터 문제가 있었는지, 어느 서버인지, 어떤 버전이 배포돼 있었는지, 지금까지 무엇을 확인했는지, 어떤 가설이 틀렸는지 같은 것들이다.
+
+Agent도 이 기록이 필요하다.
+
+그렇지 않으면 같은 로그를 다시 찾고, 이미 틀린 가설을 되풀이하고, 다른 버전의 코드를 수정할 수 있다.
+
+## 1. 먼저 문제의 범위를 적는다
+
+디버깅을 시작할 때 최소한 다음은 알아야 한다.
+
+~~~text
+어느 환경인가
+어느 서비스인가
+언제 문제가 있었나
+사용자는 무엇을 겪었나
+~~~
+
+이 범위가 없으면 Agent는 필요 이상으로 넓게 검색한다.
+
+## 2. 지금 보고 있는 코드가 맞는지 확인한다
+
+운영에서 장애가 난 버전과 현재 저장소의 코드가 다를 수 있다.
+
+그래서 수정 전에 다음을 확인한다.
+
+~~~text
+운영 service.version
+운영 image digest
+배포 revision
+현재 git commit
+~~~
+
+같지 않다면 먼저 차이를 본다.
+
+이 한 단계만으로도 엉뚱한 수정을 많이 막을 수 있다.
+
+## 3. 무엇을 봤는지 기록한다
+
+Agent가 metric을 보고, trace를 보고, 로그를 봤다면 그 결과를 남겨야 한다.
+
+중요한 것은 원문 전체를 저장하는 것이 아니라 어떤 자료를 보고 어떤 사실을 확인했는지 남기는 것이다.
+
+예:
+
+~~~text
+E1
+09:10~09:18 login p99 상승
+
+E2
+같은 시간 Hikari pending 증가
+
+E3
+느린 trace에서 connection acquire 2.8초
+~~~
+
+이렇게 두면 나중에 결론이 어디서 나왔는지 다시 확인할 수 있다.
+
+## 4. 사실과 추측을 섞지 않는다
+
+다음 두 문장은 다르다.
+
+~~~text
+사실
+connection acquire가 2.8초 걸렸다.
+
+추측
+connection pool 고갈이 원인일 수 있다.
+~~~
+
+Agent는 이 둘을 따로 기록해야 한다.
+
+## 5. 반대 증거도 적는다
+
+사람은 자기가 만든 가설에 맞는 정보만 보고 싶어지는 경향이 있다. Agent도 비슷한 실수를 할 수 있다.
+
+그래서 가설마다 반대 증거를 함께 적는다.
+
+~~~text
+가설
+DB 서버가 느리다.
+
+지지
+API latency 상승
+
+반대
+DB CPU 정상
+실제 SQL 실행 34ms
+~~~
+
+이렇게 하면 첫 가설에 너무 빨리 고정되는 것을 줄일 수 있다.
+
+## 6. 수정 전에 가능하면 재현한다
+
+원인 후보를 찾았다고 바로 코드를 바꾸지 않는다.
+
+가능하면 같은 실패를 다시 만들거나 최소한 같은 증상이 나타나는 조건을 확인한다.
+
+재현이 어렵다면 무엇이 재현되지 않았는지 명시한다.
+
+## 7. 수정 후에는 처음 증상을 다시 본다
+
+테스트가 통과했다고 장애가 해결됐다고 말하면 안 된다.
+
+처음 문제가 p99 latency였다면 수정 후 p99를 다시 본다.
+
+처음 문제가 Pod restart였다면 restart가 멈췄는지 본다.
+
+처음 문제가 DB pool pending이었다면 그 값이 정상으로 돌아왔는지 확인한다.
+
+이것이 가장 간단하면서도 강력한 검증 방법이다.
+
+## 8. 이 흐름에 이름을 붙인다면
+
+이 책에서는 이런 한 번의 조사 기록을 'Agent Debug Session Contract'라고 부르겠다.
+
+이 이름을 외울 필요는 없다.
+
+핵심은 다음이다.
+
+~~~text
+문제 범위
+→ 실행 버전
+→ 확인한 증거
+→ 원인 후보
+→ 재현
+→ 수정
+→ 다시 확인
+~~~
+
+## 9. 이 장에서 기억할 것
+
+> Agent가 무엇을 생각했는지보다 무엇을 확인했는지가 더 중요하다.
+
+> 수정은 증거와 연결되어야 하고, 검증은 처음 증상으로 돌아가야 한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-OPENRCA] OpenRCA
+- [S-BTS-AGENTBENCH] BTS-AgentBench
+
+# 11장. Agent에게 주는 도구는 작고 제한적이어야 한다
+
+Agent에게 운영 시스템 접근 권한을 줄 때 가장 쉬운 방법은 shell 하나를 주는 것이다.
+
+curl도 할 수 있고, kubectl도 할 수 있고, SQL도 실행할 수 있다.
+
+유연하다.
+
+하지만 운영에서는 너무 넓다.
+
+## 1. 도구가 넓으면 실수 범위도 넓어진다
+
+예를 들어 Agent가 로그를 보기 위해 shell을 쓴다고 하자.
+
+실수로 파일을 지울 수도 있고, 잘못된 서버에 접속할 수도 있고, 너무 넓은 조회를 실행할 수도 있다.
+
+그래서 운영용 디버깅 도구는 목적을 작게 나누는 편이 낫다.
+
+## 2. 질문 하나에 도구 하나
+
+예를 들면 다음 정도다.
+
+~~~text
+지표 보기
+느린 trace 찾기
+특정 trace 로그 보기
+Pod 상태 보기
+배포 버전 보기
+JFR 요약 보기
+~~~
+
+각 도구는 할 수 있는 일이 작다.
+
+대신 감사와 제한이 쉬워진다.
+
+## 3. 조회 범위를 도구가 강제한다
+
+Agent가 매번 '30분만 검색해'라는 지시를 잘 지킬 것이라고 기대하지 않는다.
+
+도구가 직접 제한한다.
+
+~~~text
+최대 시간 범위
+최대 결과 수
+최대 scan 크기
+허용 environment
+허용 service
+~~~
+
+이런 제한은 prompt보다 강하다.
+
+## 4. 결과도 너무 많이 주지 않는다
+
+도구는 결과 전체보다 먼저 요약을 줄 수 있다.
+
+예를 들어 trace 조회 결과는 처음에:
+
+- 가장 느린 span
+- error span
+- 서비스 이동
+- 전체 duration
+
+정도만 주고, 필요할 때 상세 span을 더 본다.
+
+이 방식은 사람의 UI와 비슷하다.
+
+처음부터 모든 세부정보를 펼쳐놓지 않는다.
+
+## 5. JVM 진단 도구는 별도로 다룬다
+
+기존 metric을 읽는 것과 thread dump를 새로 뜨는 것은 다르다.
+
+그래서 JFR, thread dump, heap dump 같은 기능은 일반 조회 도구와 나누는 것이 좋다.
+
+예:
+
+~~~text
+일반 조회
+metrics / logs / traces
+
+추가 진단
+JFR / thread dump
+
+고비용 진단
+heap dump
+~~~
+
+## 6. Kubernetes도 읽기와 실행을 나눈다
+
+Pod 상태를 보는 것과 Pod 안에 exec로 들어가는 것은 다르다.
+
+기본 Agent에는 get/list 정도만 주고, exec나 restart는 별도 권한으로 둔다.
+
+## 7. Grafana MCP는 좋은 기본 재료다
+
+Prometheus, Loki, Tempo, Pyroscope 쪽은 Grafana MCP가 이미 많은 기능을 제공한다.
+
+따라서 처음부터 새 MCP 서버를 전부 만들 필요는 없다.
+
+필요한 것은 그 위에서 범위와 권한을 더 좁히는 일이다.
+
+## 8. 범용 Python 도구는 어디에 쓸까
+
+OpenRCA는 Python executor를 이용해 관측 데이터를 자유롭게 분석한다.
+
+연구나 offline 분석에서는 매우 유연하다.
+
+하지만 운영에서는 범위가 너무 넓을 수 있다.
+
+그래서 이 책에서는:
+
+~~~text
+Production
+작은 전용 도구 우선
+
+Offline / Sandbox
+필요하면 Python 분석 허용
+~~~
+
+정도로 나누는 편을 권한다.
+
+## 9. 이 장에서 기억할 것
+
+> Agent에게 강력한 도구 하나보다 작고 제한된 도구 여러 개를 주는 편이 운영에서는 안전하다.
+
+> 중요한 제한은 prompt가 아니라 도구 자체에서 강제한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-GRAFANA-MCP] Grafana MCP
+- [S-OPENRCA] OpenRCA
+
+# 12장. 로그를 찾았다고 원인을 찾은 것은 아니다
+
+Agent가 metric을 보고, trace를 보고, 로그까지 찾았다.
+
+이제 원인을 알았다고 말해도 될까?
+
+아직 아니다.
+
+운영 디버깅에서 가장 위험한 순간은 정보가 없을 때가 아니라, 그럴듯한 정보가 하나 보였을 때다.
+
+## 1. 같이 나타났다고 원인은 아니다
+
+다음 두 현상이 같은 시간에 일어났다.
+
+~~~text
+API latency 상승
+CPU 상승
+~~~
+
+CPU가 원인일 수도 있다.
+
+반대로 retry가 폭증하면서 CPU가 같이 올라간 결과일 수도 있다.
+
+그래서 Agent는 '같이 나타남'과 '원인'을 구분해야 한다.
+
+## 2. 한 번에 하나의 가설을 시험한다
+
+예를 들어 로그인 지연 문제에서 다음 가설이 있다고 하자.
+
+~~~text
+H1 DB가 느리다
+H2 connection pool이 부족하다
+H3 외부 인증 API가 느리다
+~~~
+
+각 가설을 구분할 수 있는 질문을 만든다.
+
+H1을 보려면 실제 SQL 실행 시간을 본다.
+
+H2를 보려면 connection acquire 시간과 pool pending을 본다.
+
+H3을 보려면 outbound span을 본다.
+
+이렇게 하면 Agent가 막연한 추측을 반복하지 않는다.
+
+## 3. 맞는 증거만 찾지 않는다
+
+H2를 의심한다고 Hikari pending만 계속 찾으면 안 된다.
+
+반대 자료도 본다.
+
+예를 들어 pool pending은 증가했지만 connection acquire는 빠르다면 H2는 약해진다.
+
+가설은 증거가 쌓이면 강해지고, 반대 증거가 나오면 약해져야 한다.
+
+## 4. 정보를 못 찾은 것과 정보가 없는 것은 다르다
+
+이 구분은 매우 중요하다.
+
+Agent가 error log를 못 찾았다.
+
+가능성은 두 가지 이상이다.
+
+~~~text
+실제로 error log가 없다
+검색 범위가 틀렸다
+로그가 잘렸다
+sampling됐다
+trace 연결이 끊겼다
+~~~
+
+그래서 '찾지 못함'을 곧바로 '없음'으로 해석하면 안 된다.
+
+## 5. OpenRCA가 보여준 중요한 점
+
+OpenRCA에서는 관측 데이터를 직접 분석하는 Agent가 반복해서 작은 분석을 수행한다.
+
+핵심은 모델이 한 번에 정답을 말하는 것이 아니다.
+
+~~~text
+질문
+→ 분석
+→ 결과
+→ 다음 질문
+~~~
+
+이 반복이 실제 디버깅과 닮아 있다.
+
+## 6. 우연히 맞힌 답을 구분해야 한다
+
+Agent가 원인을 맞혔다.
+
+하지만 관련 metric도 trace도 보지 않았다.
+
+이 결과를 성공으로만 기록하면 실험이 왜곡된다.
+
+그래서 평가할 때는 '정답을 맞혔는가'와 '필요한 증거를 확인했는가'를 따로 봐야 한다.
+
+이 책에서는 이런 경우를 편의상 '운 좋게 맞힌 진단'으로 구분한다.
+
+## 7. 좋은 디버깅 기록은 다시 읽을 수 있다
+
+다른 개발자가 Agent의 결과를 보고 다음 질문에 답할 수 있어야 한다.
+
+- 왜 이 원인을 선택했는가?
+- 어떤 증거를 봤는가?
+- 어떤 다른 가능성을 버렸는가?
+- 무엇은 아직 모르는가?
+- 수정 후 무엇이 좋아졌는가?
+
+이 질문에 답할 수 없다면 결과가 맞더라도 운영에서 신뢰하기 어렵다.
+
+## 8. Part III를 정리하면
+
+여기까지의 구조는 생각보다 단순하다.
+
+~~~text
+운영 데이터
+  ↓
+Grafana MCP 같은 조회 도구
+  ↓
+작고 제한된 질문
+  ↓
+확인한 사실
+  ↓
+원인 후보
+  ↓
+재현
+  ↓
+수정
+  ↓
+같은 증상 다시 확인
+~~~
+
+다음 Part부터는 이 흐름을 Spring Boot 애플리케이션에 실제로 적용한다.
+
+## 9. 이 장에서 기억할 것
+
+> 증거는 사실이고, 원인은 해석이다.
+
+> 찾지 못한 것과 존재하지 않는 것을 구분해야 한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-OPENRCA] OpenRCA
+- [S-RCA-REALWORLD-2026] Real-world 관측 데이터 RCA
+- [S-BTS-AGENTBENCH] BTS-AgentBench
+
+---
+
+# Part IV. Spring Boot 애플리케이션을 실제로 디버깅한다
+
+# 13장. Spring Boot에 Agent가 읽을 수 있는 흔적을 남긴다
+
+Agent가 운영 문제를 잘 찾게 하려면 먼저 애플리케이션이 충분한 흔적을 남겨야 한다.
+
+이 장의 목표는 거창한 관측 시스템을 만드는 것이 아니다.
+
+Spring Boot 애플리케이션에서 최소한 무엇을 남겨야 다음 장의 디버깅이 가능한지 정리한다.
+
+## 1. 로그만 남겨서는 부족하다
+
+다음 로그가 있다고 하자.
+
+~~~text
+2026-10-05 09:10:14 WARN connection timeout
+~~~
+
+이 한 줄만으로는 알기 어렵다.
+
+- 어떤 요청이었는가
+- 어느 서버에서 발생했는가
+- 어느 버전이었는가
+- 같은 요청의 trace는 무엇인가
+
+그래서 로그에는 최소한 요청과 실행 버전을 연결할 수 있는 정보가 필요하다.
+
+## 2. traceId와 spanId를 로그에 같이 남긴다
+
+Spring Boot와 Micrometer Tracing을 사용하면 traceId와 spanId를 MDC에 넣어 로그와 trace를 연결할 수 있다.
+
+예:
+~~~text
+traceId=4f91... spanId=7ab2...
+service=login-service
+version=a81c92f
+message=connection timeout
+~~~
+
+이제 Agent는 trace ID를 기준으로 로그와 실행 경로를 묶어 볼 수 있다.
+
+## 3. service.version을 반드시 남긴다
+
+운영 장애에서 가장 위험한 실수 중 하나는 다른 버전의 코드를 고치는 것이다.
+
+그래서 최소한 다음은 남겨야 한다.
+
+~~~text
+service.name
+service.version
+deployment.environment.name
+~~~
+
+가능하면 image digest와 배포 revision도 함께 둔다.
+
+## 4. HTTP 호출의 trace가 끊기지 않게 한다
+
+서비스 A가 서비스 B를 호출한다.
+
+trace가 잘 이어지면 한 요청으로 보인다.
+
+~~~text
+A /login
+  ↓
+B /user
+~~~
+
+하지만 직접 만든 HTTP client 때문에 맥락 propagation이 빠지면 두 trace가 분리된다.
+
+Agent는 downstream 호출 자체가 없었던 것처럼 오해할 수 있다.
+
+그래서 auto-configured client를 사용하거나 trace propagation을 명시적으로 확인해야 한다.
+
+## 5. DB 호출도 trace에 남긴다
+
+DB 문제를 찾으려면 적어도 다음은 보여야 한다.
+
+- query summary
+- duration
+- error type
+- connection acquire와 조회 execute의 구분
+
+특히 connection을 얻는 데 오래 걸린 것과 SQL 실행이 느린 것은 전혀 다른 문제다.
+
+## 6. 로그는 가능하면 구조화한다
+
+JSON 로그는 Agent에게도 유리하다.
+
+예:
+~~~json
+{
+  "service": "login-service",
+  "traceId": "4f91...",
+  "event": "connection_acquire_timeout",
+  "active": 20,
+  "idle": 0,
+  "pending": 37
+}
+~~~
+
+자연어 로그보다 숫자와 key가 분리되어 있어 검색과 비교가 쉽다.
+
+## 7. 그래도 모든 값을 로그에 넣지 않는다
+
+요청 body, Authorization header, cookie, SQL parameter 같은 값은 민감할 수 있다.
+
+Agent가 보기 편하다는 이유로 수집 범위를 늘리면 안 된다.
+
+필요한 correlation 정보와 디버깅 정보만 남긴다.
+
+## 8. 최소 구성
+
+다음 정도면 이후 실습을 진행하기에 충분하다.
+
+~~~text
+Spring Boot
+  ├─ Micrometer Observation
+  ├─ Tracing
+  ├─ traceId/spanId log correlation
+  ├─ structured log
+  ├─ DB span
+  ├─ JVM metrics
+  └─ service.version
+
+Backend
+  ├─ Prometheus
+  ├─ Loki
+  ├─ Tempo
+  └─ Pyroscope
+~~~
+
+## 9. 이제 실제 장애를 따라가 보자
+
+여기까지는 준비 단계였다.
+
+다음 장부터는 이 구성을 실제 장애에 적용한다.
+
+첫 번째 사례는 가장 흔하면서도 오판하기 쉬운 DB connection pool 문제다.
+
+로그에 SQL timeout이 보이지만 실제 SQL은 빠른 상황을 따라가 보자.
+
+## 10. 이 장에서 기억할 것
+
+> Agent가 볼 수 있는 흔적을 남기되, 같은 요청과 같은 실행 버전을 서로 연결할 수 있어야 한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-SPRING-OBS] Spring Boot 관측 시스템
+- [S-OTEL-LOGS] OpenTelemetry Logging Specification
+
+# 14장. DB Connection Pool이 바닥났을 때
+
+월요일 오전, 로그인 API가 간헐적으로 3초씩 멈춘다.
+
+로그에는 SQL timeout이 보인다.
+
+첫 느낌은 'DB가 느려졌나?'다.
+
+Agent도 소스코드만 보면 같은 추측을 하기 쉽다.
+
+하지만 실제 원인은 connection pool일 수 있다.
+
+## 1. 먼저 증상을 본다
+
+Prometheus에서 로그인 API p99를 본다.
+
+~~~text
+09:08 180ms
+09:10 900ms
+09:12 3.1s
+09:18 220ms
+~~~
+
+같은 시간대의 DB CPU는 정상이다.
+
+반면 Hikari pending connection이 올라간다.
+
+~~~text
+active 20
+idle 0
+pending 37
+~~~
+
+이제 'DB 자체가 느리다'는 가설보다 'connection을 얻기 어렵다'는 가설이 강해진다.
+
+## 2. 느린 요청 하나를 본다
+
+Tempo에서 느린 trace를 찾는다.
+
+~~~text
+POST /login                 3.1s
+ └ authenticate             3.0s
+    ├ acquireConnection     2.8s
+    └ SELECT user           34ms
+~~~
+
+여기서 중요한 건 34ms와 2.8초의 차이다.
+
+SQL은 빠르다.
+
+기다린 곳은 connection acquire다.
+
+## 3. 같은 trace의 로그를 확인한다
+
+Loki에서 trace ID를 검색한다.
+
+~~~text
+connection acquisition timeout
+active=20 idle=0 pending=37
+~~~
+
+이제 세 가지 증거가 같은 방향을 가리킨다.
+
+- API 지연
+- pool pending 증가
+- connection acquire 지연
+
+## 4. 그래도 아직 원인은 하나 더 남아 있다
+
+pool이 부족한 이유는 여러 가지다.
+
+- max pool size가 너무 작음
+- transaction이 너무 김
+- connection leak
+- 외부 호출을 transaction 안에서 오래 기다림
+
+그래서 소스코드를 본다.
+
+예를 들어 transaction 안에서 외부 API를 호출하고 있었다고 하자.
+
+~~~text
+transaction 시작
+  ↓
+DB 조회
+  ↓
+외부 API 2초 대기
+  ↓
+transaction 종료
+~~~
+
+이 동안 connection이 잡혀 있으면 traffic이 몰릴 때 pool이 빠르게 바닥난다.
+
+## 5. 잘못된 첫 수정
+
+이 상황에서 pool size만 20에서 50으로 늘리면 증상은 잠시 좋아질 수 있다.
+
+하지만 원인이 긴 transaction이라면 병목을 뒤로 미룬 것뿐이다.
+
+그래서 Agent는 '증상 완화'와 '원인 수정'을 구분해야 한다.
+
+## 6. 재현한다
+
+테스트 환경에서 같은 traffic을 만든다.
+
+관찰 항목은 단순하다.
+
+- p99
+- active/pending connection
+- connection acquire 시간
+
+문제가 재현되면 transaction 범위를 줄이거나 외부 호출을 transaction 밖으로 옮긴다.
+
+## 7. 수정 후 처음 증상을 다시 본다
+
+같은 부하를 다시 건다.
+
+~~~text
+Before
+p99 3.1s
+pending 37
+acquire 2.8s
+
+After
+p99 240ms
+pending 0~2
+acquire 8ms
+~~~
+
+이제야 장애가 해결됐다고 말할 수 있다.
+
+## 8. Agent는 어떤 순서로 움직였나
+
+~~~text
+지연시간 확인
+→ pool 지표 확인
+→ 느린 trace 확인
+→ 같은 trace 로그 확인
+→ 소스코드에서 긴 transaction 확인
+→ 재현
+→ 수정
+→ 같은 지표로 재검증
+~~~
+
+## 9. 다음 사례에서는 로그가 거의 도움이 되지 않는다
+
+이번 사례는 metric, trace, log가 비교적 잘 맞아떨어졌다.
+
+하지만 모든 장애가 이렇게 친절하지는 않다.
+
+다음 장에서는 오류 로그도 없고 CPU도 높지 않은데 요청만 느린 상황을 본다.
+
+그때는 profile과 thread 상태가 더 중요해진다.
+
+## 10. 이 장에서 기억할 것
+
+> timeout 로그가 보인다고 SQL부터 고치지 않는다.
+
+> 어디에서 기다렸는지 trace로 먼저 구분한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-PROM-API] Prometheus HTTP API
+- [S-TEMPO-API] Tempo HTTP API
+- [S-SPRING-OBS] Spring Boot 관측 시스템
+
+
+# 15장. Lock Contention은 로그만으로 보이지 않는다
+
+이번에는 API가 느리지만 로그에는 특별한 오류가 없다.
+
+CPU도 높지 않다. DB도 정상이다. 모든 요청은 결국 200으로 끝난다.
+
+이런 문제는 개발자를 더 답답하게 만든다. 실패했다는 흔적이 거의 없기 때문이다.
+
+## 1. 처음에는 DB를 의심하기 쉽다
+
+report API가 평소 300ms 안에 끝나는데 특정 시간대부터 2초가 넘는다.
+
+로그에 예외는 없다. DB 조회도 대부분 20~30ms다.
+
+소스코드만 보면 report 생성 로직이 무거워 보인다. Agent도 처음에는 SQL이나 CPU 사용을 의심할 수 있다.
+
+하지만 Prometheus에서 CPU를 보면 35% 수준이다.
+
+이럴 때는 질문을 바꿔야 한다.
+
+> 계산하느라 느린 것이 아니라 기다리느라 느린 것은 아닐까?
+
+## 2. trace에서 시간이 멈춘 위치를 찾는다
+
+Tempo에서 느린 요청 하나를 본다.
+
+~~~text
+POST /report 2.4s
+ └ generateReport 2.2s
+~~~
+
+문제 위치는 좁혀졌다. 하지만 generateReport 안에서 왜 2.2초가 걸렸는지는 아직 모른다.
+
+여기서 CPU profile만 보면 답이 잘 안 나올 수 있다. 실제로 CPU를 거의 쓰지 않고 기다리고 있기 때문이다.
+
+## 3. wall profile을 보면 기다린 시간이 보인다
+
+Pyroscope wall profile에서 다음 패턴이 크게 보인다고 하자.
+
+~~~text
+OrderLock.acquire
+  ↓
+LockSupport.park
+~~~
+
+이제 lock을 기다리는 시간이 길다는 가능성이 생긴다.
+
+중요한 점은 여기서도 바로 결론을 내리지 않는 것이다.
+
+LockSupport.park는 여러 이유로 나타날 수 있다. 그래서 더 구체적인 자료가 필요하다.
+
+## 4. thread dump로 같은 stack이 몰려 있는지 본다
+
+thread dump를 요약해보니 다음과 같다.
+
+~~~text
+RUNNABLE 18
+WAITING  71
+BLOCKED  12
+
+Top blocked stack
+OrderLock.acquire() 10 threads
+
+Deadlock
+none
+~~~
+
+여러 요청 thread가 같은 위치에서 기다리고 있다.
+
+이제 '한 요청이 우연히 늦었다'가 아니라 '여러 요청이 같은 lock 앞에서 줄을 섰다'는 사실을 확인할 수 있다.
+
+## 5. JFR은 시간 흐름을 확인할 때 유용하다
+
+thread dump는 한 순간의 사진에 가깝다.
+
+JFR에서 같은 시간대의 monitor contention이나 thread park event를 보면 문제가 몇 초 동안 반복됐는지 확인할 수 있다.
+
+이 단계까지 와야 lock contention이라는 원인 후보가 충분히 강해진다.
+
+## 6. 소스코드로 돌아간다
+
+이제 소스코드를 본다.
+
+예를 들어 모든 report 생성을 하나의 전역 lock으로 감싸고 있었다고 하자.
+
+~~~text
+synchronized(globalLock) {
+  generateReport();
+}
+~~~
+
+한 요청이 report를 만드는 동안 나머지 요청은 기다린다.
+
+traffic이 적을 때는 잘 드러나지 않지만 동시 요청이 늘면 p99가 빠르게 악화된다.
+
+## 7. 흔한 잘못된 수정
+
+이 상황에서 thread pool 크기만 늘리면 어떻게 될까?
+
+기다리는 thread 수만 늘어날 수 있다.
+
+CPU가 남아 있으니 worker를 늘리자는 판단은 자연스럽지만, 병목이 lock이라면 문제를 해결하지 못한다.
+
+또 timeout만 늘리면 사용자는 더 오래 기다리게 된다.
+
+증상을 완화하는 설정 변경과 원인을 고치는 수정은 구분해야 한다.
+
+## 8. 수정 방법은 lock의 목적에 따라 달라진다
+
+전역 lock이 정말 필요한지 먼저 본다.
+
+가능한 수정은 상황마다 다르다.
+
+- lock 범위를 줄인다.
+- 오래 걸리는 작업을 lock 밖으로 옮긴다.
+- 전역 lock을 key별 lock으로 나눈다.
+- 불변 자료를 미리 계산해 공유한다.
+
+중요한 것은 특정 패턴을 외우는 것이 아니라 왜 그 lock이 존재하는지 확인하는 것이다.
+
+## 9. 수정 후 같은 자료를 다시 본다
+
+같은 부하를 다시 건다.
+
+Before:
+~~~text
+p99 2.4s
+BLOCKED 12
+OrderLock.acquire 10 threads
+~~~
+
+After:
+~~~text
+p99 320ms
+BLOCKED 0~1
+OrderLock.acquire hotspot 사라짐
+~~~
+
+이제 단위 테스트 통과보다 훨씬 강한 검증이 된다.
+
+## 10. Agent가 따라야 할 순서
+
+~~~text
+느린 API 확인
+→ DB와 CPU가 정상인지 확인
+→ 느린 trace에서 위치 확인
+→ wall profile로 대기 여부 확인
+→ thread/JFR로 lock 경쟁 확인
+→ 소스코드에서 lock 범위 확인
+→ 수정
+→ 같은 부하로 다시 확인
+~~~
+
+## 11. 느린 SQL과 느린 요청은 다른 문제다
+
+여기서는 SQL도 CPU도 큰 문제가 아니었다.
+
+다음 장에서는 반대로 DB 호출이 많이 보이지만 각 SQL은 빠른 상황을 살펴본다.
+
+한 쿼리가 느린 것이 아니라 같은 쿼리가 너무 많이 반복되는 N+1 문제다.
+
+## 이 장의 한 문장
+
+> CPU가 낮은데 느리다면 계산보다 대기를 먼저 의심해볼 수 있다.
+
+> trace로 위치를 찾고 profile과 thread 정보로 이유를 확인한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-PYROSCOPE] Grafana Pyroscope
+- [S-ORACLE-JCMD] Oracle JDK 25 — jcmd/JFR
+
+
+# 16장. N+1은 느린 SQL 하나가 아니다
+
+목록 API가 데이터가 적을 때는 빠른데, 데이터가 많아질수록 급격히 느려진다.
+
+로그에는 특별한 timeout이 없다.
+
+DB CPU도 크게 치솟지 않는다.
+
+이럴 때 흔한 원인 중 하나가 N+1이다.
+
+## 1. 먼저 한 요청 안에서 SQL이 몇 번 실행됐는지 본다
+
+Tempo에서 느린 trace 하나를 연다.
+
+~~~text
+GET /orders 1.8s
+ ├─ SELECT orders       22ms
+ ├─ SELECT customer      9ms
+ ├─ SELECT customer      8ms
+ ├─ SELECT customer      9ms
+ ├─ SELECT customer      8ms
+ └─ ... 반복
+~~~
+
+각 SQL 하나만 보면 빠르다.
+
+문제는 같은 종류의 조회가 수십 번, 수백 번 반복된다는 점이다.
+
+## 2. 느린 SQL만 찾으면 놓칠 수 있다
+
+일반적인 slow query 분석은 오래 걸린 SQL을 찾는 데 강하다.
+
+하지만 N+1에서는 각각의 조회가 짧다.
+
+그래서 다음 질문이 더 중요하다.
+
+> 한 요청에서 같은 조회가 몇 번 실행됐는가?
+
+## 3. query summary로 묶어 본다
+
+원문 SQL 전체보다 query summary를 이용하면 같은 종류의 조회를 묶기 쉽다.
+
+예:
+~~~text
+SELECT orders        x1
+SELECT customer      x120
+~~~
+
+이제 문제가 선명해진다.
+
+## 4. 데이터 양과 호출 수를 비교한다
+
+10건을 조회할 때 customer 조회가 10번, 100건을 조회할 때 100번이라면 관계가 거의 그대로 드러난다.
+
+~~~text
+rows=10   → child query 10
+rows=50   → child query 50
+rows=100  → child query 100
+~~~
+
+이런 패턴은 단일 SQL latency보다 훨씬 강한 증거다.
+
+## 5. 소스코드에서 반복 접근을 찾는다
+
+Repository 하나만 보는 것이 아니라 loop 안에서 lazy relation이나 추가 조회가 발생하는지 본다.
+
+예를 들어 각 Order를 순회하면서 customer를 따로 조회하고 있을 수 있다.
+
+## 6. SQL parameter는 굳이 보여줄 필요가 없다
+
+이 문제를 찾는 데 customer ID 실제 값은 필요하지 않다.
+
+조회 종류와 호출 횟수만으로도 충분하다.
+
+민감한 parameter를 Agent에게 넘기지 않아도 디버깅할 수 있다는 좋은 예다.
+
+## 7. 수정 후 무엇을 확인할까
+
+fetch join, batch fetch, bulk 조회 등으로 수정한 뒤 같은 요청을 다시 실행한다.
+
+비교할 것은 다음이다.
+
+~~~text
+Before
+DB spans = 121
+latency = 1.8s
+
+After
+DB spans = 2
+latency = 180ms
+~~~
+
+## 8. 다음부터는 코드 밖도 본다
+
+14~16장은 애플리케이션 코드 안에서 원인을 찾을 수 있는 사례였다.
+
+하지만 운영 장애는 JVM이나 Kubernetes, 배포 상태에서 시작될 수도 있다.
+
+다음 장에서는 애플리케이션 로그보다 Pod 상태가 더 중요한 경우를 본다.
+
+## 9. 이 장에서 기억할 것
+
+> N+1은 '느린 SQL' 문제가 아니라 '너무 많은 SQL' 문제다.
+
+> Agent가 조회 시간뿐 아니라 한 요청 안의 반복 횟수를 볼 수 있어야 한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-OTEL-SQL] OpenTelemetry SQL database semantic conventions
+- [S-TEMPO-API] Tempo HTTP API
+
+
+# 17장. 장애가 코드가 아닐 때
+
+API가 간헐적으로 500을 반환한다.
+
+애플리케이션 로그를 뒤져도 결정적인 예외가 없다. 그런데 Pod restart count는 계속 올라간다.
+
+이럴 때 코드만 붙잡고 있으면 문제를 놓칠 수 있다.
+
+## 1. 먼저 '애플리케이션이 죽은 것'인지 확인한다
+
+해당 workload의 Pod 상태를 본다.
+
+~~~text
+restartCount = 6
+lastState.reason = OOMKilled
+~~~
+
+이 한 줄만으로도 조사 방향이 크게 바뀐다.
+
+이제 NullPointerException보다 memory를 먼저 봐야 한다.
+
+## 2. Event는 힌트다
+
+같은 시간대의 Kubernetes Event를 본다.
+
+~~~text
+Reason: OOMKilling
+Action: Killing
+~~~
+
+하지만 Event 하나로 결론을 내리지는 않는다.
+
+Event는 보조 자료다. retention도 제한적이고 message도 완전한 원인 설명이 아니다.
+
+Pod 상태와 memory metric을 같이 본다.
+
+## 3. OOMKilled와 eviction은 다르다
+
+둘 다 Pod가 사라지거나 재시작될 수 있지만 조사 방향은 다르다.
+
+### 컨테이너 OOM
+
+애플리케이션 container가 memory limit을 넘어서 죽는다.
+
+확인할 것:
+- container memory usage
+- memory limit
+- JVM heap/native memory
+- allocation profile
+
+### Node pressure에 의한 eviction
+
+애플리케이션 자체는 limit 안에 있어도 Node 전체 memory가 부족해 Pod가 쫓겨날 수 있다.
+
+확인할 것:
+- Node memory pressure
+- eviction event
+- 다른 workload의 사용량
+
+이 둘을 구분하지 않으면 Java heap만 며칠 동안 분석할 수 있다.
+
+## 4. 시간 순서를 맞춘다
+
+Prometheus와 Kubernetes 상태를 같은 시간축으로 놓는다.
+
+예를 들어:
+~~~text
+09:11 memory 70%
+09:12 memory 88%
+09:13 limit 근접
+09:13:20 OOMKilled
+09:13:25 Pod restart
+09:13~09:14 5xx 증가
+~~~
+
+이렇게 보면 5xx가 코드 예외 때문에 시작된 것인지 Pod 재시작의 결과인지 구분하기 쉬워진다.
+
+## 5. 그다음에야 애플리케이션 내부를 본다
+
+컨테이너 OOM이 맞다면 원인은 여전히 여러 가지다.
+
+- memory leak
+- 한 번에 너무 큰 데이터 처리
+- 무제한 cache
+- 최근 배포의 allocation 증가
+- heap/container limit 설정 불일치
+
+이제 JVM metric, allocation profile, 최근 source diff를 본다.
+
+## 6. 배포 직후라면 버전도 함께 본다
+
+revision 41까지 정상이고 revision 42부터 memory가 증가했다면 최근 변경과 연결할 수 있다.
+
+~~~text
+revision 41
+memory peak 55%
+
+revision 42
+memory peak 95%
+OOMKilled
+~~~
+
+이때 image digest와 source commit까지 맞추면 어떤 변경을 봐야 하는지 훨씬 명확해진다.
+
+## 7. Agent에게 Kubernetes 권한을 어디까지 줄까
+
+대부분의 조사에는 읽기 권한이면 충분하다.
+
+~~~text
+Pod status 조회
+Event 조회
+Deployment 조회
+ReplicaSet/revision 조회
+Node pressure 조회
+~~~
+
+Pod 안에 exec로 들어가거나 restart, scale, delete를 하는 권한은 별도로 둔다.
+
+읽기와 조치를 한 묶음으로 주지 않는다.
+
+## 8. 수정 후에는 애플리케이션과 플랫폼을 같이 확인한다
+
+memory regression을 고쳤다면 같은 부하에서 다음을 본다.
+
+- memory peak
+- GC
+- Pod restart count
+- OOM/eviction Event
+- API error rate
+
+memory만 정상이라고 끝내지 않는다. 사용자가 겪었던 5xx도 사라졌는지 확인한다.
+
+## 9. Agent가 따라야 할 순서
+
+~~~text
+5xx 증가
+→ Pod restart 확인
+→ 종료 이유 확인
+→ Event와 resource metric 교차 확인
+→ OOM인지 eviction인지 구분
+→ runtime/source version 확인
+→ JVM/profile 또는 Node 상태 분석
+→ 수정
+→ restart + error rate 재검증
+~~~
+
+## 10. 마지막으로 '어떤 코드가 실행 중이었는가'를 확인한다
+
+Pod와 Node 상태까지 봤다면 한 가지 질문이 더 남는다.
+
+이 장애가 어느 배포 버전에서 발생했는가?
+
+다음 장에서는 운영 trace의 버전과 현재 저장소의 코드가 다를 때 어떤 실수가 생기는지 살펴본다.
+
+## 이 장의 한 문장
+
+> 애플리케이션 장애가 항상 애플리케이션 코드에서 시작되는 것은 아니다.
+
+> Pod와 Node 상태도 코드와 같은 수준의 디버깅 자료로 봐야 한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-K8S-EVENT] Kubernetes Event API
+- [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
+- [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping
+
+
+# 18장. 이미 다른 버전이 운영 중이라면
+
+운영에서 NullPointerException이 발생했다.
+
+stack trace에는 UserService.java 142번째 줄이라고 나온다.
+
+Agent가 현재 main branch를 열어 142번째 줄을 본다.
+
+그런데 그 줄에는 문제가 없다.
+
+이런 상황은 생각보다 쉽게 생긴다.
+
+운영 코드와 현재 저장소 코드가 다르기 때문이다.
+
+## 1. line number를 믿기 전에 버전을 확인한다
+
+먼저 장애 trace나 로그에서 service.version을 본다.
+
+~~~text
+service.version = a81c92f
+~~~
+
+현재 workspace는:
+~~~text
+git commit = b115e91
+~~~
+
+다르다.
+
+이제 142번째 줄을 그대로 비교하면 안 된다.
+
+## 2. image digest도 확인한다
+
+tag는 바뀔 수 있다.
+
+~~~text
+myapp:latest
+~~~
+
+같은 이름이라도 다른 image일 수 있다.
+
+가능하면 digest처럼 바뀌지 않는 식별자를 사용한다.
+
+~~~text
+sha256:ab34...
+~~~
+
+## 3. 배포 revision을 같이 본다
+
+Kubernetes에서는 배포 revision을 통해 어느 rollout에서 문제가 시작됐는지 확인할 수 있다.
+
+~~~text
+revision 41 정상
+revision 42 error rate 증가
+~~~
+
+이제 recent source diff와 연결하기 쉽다.
+
+## 4. Agent가 해야 할 첫 행동이 바뀐다
+
+버전이 다르면 바로 수정을 만들지 않는다.
+
+먼저 다음 중 하나를 한다.
+
+- 해당 commit checkout
+- 해당 tag/branch 찾기
+- 두 버전 diff 확인
+- source artifact를 찾지 못하면 불확실하다고 표시
+
+## 5. 오래된 장애도 있다
+
+운영에서 이미 새 버전이 배포돼 문제가 사라졌는데 과거 장애를 분석하고 있을 수도 있다.
+
+이때 현재 관측 데이터와 과거 로그를 섞으면 잘못된 결론이 나온다.
+
+시간과 버전을 함께 봐야 한다.
+
+## 6. 설정 버전도 중요하다
+
+코드는 같아도 설정이 다르면 동작이 달라질 수 있다.
+
+예:
+- connection pool size
+- feature flag
+- timeout
+- retry count
+
+그래서 가능하면 config version이나 배포 configuration diff도 함께 확인한다.
+
+## 7. 수정 후 배포 버전까지 확인한다
+
+수정이 만들어졌다면 실제로 그 수정이 들어간 image가 배포됐는지 확인해야 한다.
+
+테스트 결과와 운영 결과 사이에도 version 연결이 필요하다.
+
+## 8. 이 장에서 기억할 것
+
+> 운영 장애를 고치기 전에 지금 보고 있는 코드가 실제 운영 코드인지 먼저 확인한다.
+
+> tag보다 commit과 image digest처럼 바뀌지 않는 식별자가 더 믿을 만하다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
+- [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping
+- [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
+- [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping
+

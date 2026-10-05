@@ -103,3 +103,8 @@ latency = 180ms
 > N+1은 '느린 SQL' 문제가 아니라 '너무 많은 SQL' 문제다.
 
 > Agent가 query 시간뿐 아니라 한 요청 안의 반복 횟수를 볼 수 있어야 한다.
+
+### 주요 근거
+
+- SQL/database evidence research
+- [S-TEMPO-API] Tempo HTTP API

@@ -26,7 +26,7 @@ trace_id=abc
 
 Loki에서는 모든 correlation key를 label로 만들면 안 된다.
 
-서비스 name이나 namespace처럼 cardinality가 낮은 값은 label에 잘 맞는다.
+서비스 이름이나 namespace처럼 cardinality가 낮은 값은 label에 잘 맞는다.
 
 반면 trace_id, request_id처럼 요청마다 바뀌는 값은 cardinality가 매우 높다.
 

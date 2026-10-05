@@ -4,7 +4,7 @@
 
 성능 저하는 로그에 아무것도 남기지 않을 수 있다. CPU hotspot은 stack trace로 나타나지 않는다. Pod eviction은 애플리케이션 로그보다 Kubernetes 쪽이 더 정확하다. 잘못된 배포는 exception보다 version metadata가 더 중요한 증거일 수 있다.
 
-Agentic Debugging에서 중요한 것은 '로그 접근'보다 'evidence surface'다.
+Agent에게 중요한 것은 로그 하나가 아니라 장애를 설명할 수 있는 여러 종류의 자료다.
 
 ## 1. Metrics — 어디가 이상한지 알려준다
 
@@ -128,7 +128,7 @@ config version
 
 일 수 있기 때문이다. Runtime version을 확인하지 않은 patch는 논리적으로 불완전하다.
 
-## 9. Evidence Pyramid
+## 9. 증거를 단계별로 본다
 
 모든 evidence를 같은 비용으로 취급하지 말자.
 
@@ -161,7 +161,7 @@ Deep DB Diagnostics
 Container Exec
 ~~~
 
-이를 Evidence Escalation이라고 부른다. 외부 표준이 아니라 이 책의 설계 synthesis다.
+이 책에서는 이렇게 필요할 때 더 깊은 진단으로 내려가는 방식을 '증거 단계 올리기'라고 설명하겠다. 외워야 할 표준 용어는 아니다.
 
 ## 10. 왜 escalation이 필요한가
 

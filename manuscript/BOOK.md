@@ -3271,3 +3271,941 @@ revision 42 error rate 증가
 - [S-OTEL-SERVICE] OpenTelemetry Service semantic conventions
 - [S-OTEL-K8S] OpenTelemetry Kubernetes resource mapping
 
+
+
+---
+
+# Part V. 운영 환경에서 안전하게 연결한다
+
+# 19장. 운영 관측 데이터를 Agent에게 열어도 되는가
+
+지금까지는 Agent가 Prometheus, Loki, Tempo, Pyroscope를 직접 조회하는 흐름을 만들었다.
+
+여기서 자연스럽게 다음 질문이 나온다.
+
+> 운영 데이터를 Agent에게 직접 보여줘도 괜찮을까?
+
+기술적으로 가능하다는 것과 운영에서 허용해도 된다는 것은 다른 문제다.
+
+## 1. 가장 작은 권한에서 시작한다
+
+처음부터 운영 전체를 보여줄 필요는 없다.
+
+예를 들어 login-service 장애만 조사한다면 Agent에게 필요한 것은 다음 정도다.
+
+~~~text
+environment = production
+service = login-service
+time = 09:10~09:20
+~~~
+
+이 범위를 벗어나는 조회는 gateway가 막을 수 있다.
+
+## 2. 기본은 읽기 전용이다
+
+첫 단계에서 필요한 것은 대부분 이런 정보다.
+
+- 지표
+- 로그
+- trace
+- profile
+- Pod 상태
+- 배포 버전
+
+이 단계에서는 read-only 권한으로 충분하다.
+
+대시보드 수정, alert 변경, restart, 배포 같은 기능은 따로 둔다.
+
+## 3. Agent 전용 계정을 쓴다
+
+사람 계정을 공유하지 않는다.
+
+Agent 전용 service account를 따로 만들고 필요한 datasource와 environment만 허용한다.
+
+이렇게 하면 Agent가 실수해도 영향 범위를 줄일 수 있다.
+
+## 4. 로그에 있는 민감정보는 생각보다 많다
+
+운영 로그에는 다음 값이 들어갈 수 있다.
+
+- Authorization header
+- cookie
+- 사용자 식별자
+- 요청 body
+- SQL parameter
+- 내부 URL
+
+이런 값을 prompt 직전에만 가리는 것으로 충분하지 않을 수 있다.
+
+가능하면 OpenTelemetry Collector 같은 수집 단계에서부터 제거하거나 mask한다.
+
+## 5. 외부 모델을 쓰면 데이터가 어디로 가는지 다시 본다
+
+사내 Agent가 외부 SaaS LLM을 호출한다면, Loki에서 가져온 로그 일부가 외부 provider로 전송될 수 있다.
+
+따라서 다음 질문이 필요하다.
+
+- 어떤 데이터 등급까지 외부 전송이 허용되는가?
+- 원문 대신 요약만 보낼 수 있는가?
+- tenant/user 식별자를 제거했는가?
+- trace 자체에 payload가 들어 있지 않은가?
+
+도구 연결이 가능하다고 해서 데이터 반출이 자동으로 허용되는 것은 아니다.
+
+## 6. 멀티테넌트라면 tenant 경계를 조회에 강제한다
+
+한 고객의 장애를 조사하는 Agent가 다른 고객 로그를 읽어서는 안 된다.
+
+좋은 구조는 Agent가 tenant 조건을 기억하기를 기대하지 않는다.
+
+gateway가 모든 조회에 tenant matcher를 붙인다.
+
+~~~text
+사용자 질문
+  ↓
+Agent query
+  ↓
+강제 조건
+tenant=A, service=login-service
+  ↓
+Loki/Tempo/Prometheus
+~~~
+
+## 7. 조회 비용도 운영 비용이다
+
+Agent가 반복해서 넓은 로그 검색을 하면 관측 시스템 자체가 느려질 수 있다.
+
+따라서 다음을 제한한다.
+
+- 최대 시간 범위
+- 최대 scan 크기
+- 최대 결과 수
+- 조회 timeout
+- 호출 빈도
+
+실제 Grafana MCP의 Loki guardrail이 좋은 참고 사례다. 현재 기본 모드는 `off`이므로 운영에서는 `enforce` 설정 여부를 명시적으로 확인해야 한다.
+
+## 8. 결과 크기도 제한한다
+
+조회는 작아도 결과가 매우 클 수 있다.
+
+그래서 처음에는 요약과 상위 몇 개만 반환하고, Agent가 필요할 때 더 요청하게 할 수 있다.
+
+중요한 것은 결과가 잘렸다면 반드시 표시하는 것이다.
+
+## 9. 감사 기록은 나중에 필요해진다
+
+Agent가 어떤 조회를 실행했는지 남겨야 한다.
+
+장애가 끝난 뒤 다음을 확인할 수 있어야 한다.
+
+- 어떤 데이터를 봤는가
+- 어느 시간대를 조회했는가
+- 어떤 범위를 벗어나려 했는가
+- 어떤 결과가 잘렸는가
+- 민감정보 차단이 동작했는가
+
+## 10. 작은 운영 예시
+
+login-service만 조사하는 Agent profile을 생각해보자.
+
+~~~text
+허용
+- production login-service metrics
+- production login-service logs
+- 관련 Tempo trace
+- 해당 deployment status
+
+차단
+- 다른 서비스 로그
+- 24시간 초과 query
+- raw SQL 실행
+- Pod exec
+- deployment 변경
+~~~
+
+이 정도만 해도 실제 debugging의 대부분을 시작할 수 있다.
+
+## 이 장의 한 문장
+
+> 운영 관측 권한은 처음부터 최소한으로 준다.
+
+> 읽기 권한, 데이터 범위, 조회 비용, 민감정보를 각각 따로 통제한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-GRAFANA-MCP] Grafana MCP
+- [S-OTEL-TRANSFORM] OpenTelemetry — Transforming telemetry
+
+
+# 20장. 원인을 찾은 뒤부터는 권한이 달라진다
+
+Agent가 원인 후보를 찾았다.
+
+이제 코드를 고치면 된다.
+
+여기서부터는 상황이 달라진다.
+
+운영 데이터를 보는 것과 실제 시스템을 바꾸는 것은 위험 수준이 다르기 때문이다.
+
+## 1. 조사 단계에서는 대부분 읽기만 해도 된다
+
+예를 들어 connection pool 문제를 조사하는 동안 Agent는 다음만 해도 충분하다.
+
+- Prometheus 지표 조회
+- Tempo trace 조회
+- Loki 로그 조회
+- 배포 버전 확인
+
+이 단계에서는 운영을 바꿀 이유가 없다.
+
+## 2. 진단 자료를 새로 만드는 순간 권한이 한 단계 올라간다
+
+기존 profile을 읽는 것과 운영 JVM에서 새 thread dump나 JFR을 뜨는 것은 다르다.
+
+heap dump는 더 무겁다.
+
+그래서 단순 조회와 진단 자료 생성도 분리한다.
+
+~~~text
+읽기
+metrics / logs / traces / 기존 profile
+
+추가 진단
+thread dump / JFR
+
+고비용 진단
+heap dump / deep DB diagnostics
+~~~
+
+Agent가 필요하다고 판단했다고 자동 실행할 필요는 없다.
+
+운영 영향과 민감정보 위험에 따라 승인 단계를 둘 수 있다.
+
+## 3. 로컬 수정과 운영 수정은 완전히 다른 권한이다
+
+Agent가 로컬 repository를 수정하고 테스트를 돌리는 것은 비교적 안전하다.
+
+하지만 운영 배포를 바꾸는 것은 다르다.
+
+그래서 작업을 다음처럼 나누는 편이 낫다.
+
+~~~text
+운영 데이터 읽기
+  ↓
+로컬 코드 수정
+  ↓
+테스트 실행
+  ↓
+staging 반영
+  ↓
+production 반영
+~~~
+
+각 단계는 같은 버튼의 강도 차이가 아니라 서로 다른 권한으로 본다.
+
+## 4. 실제로는 원인보다 '급한 완화'가 먼저 필요할 때도 있다
+
+예를 들어 connection pool이 고갈돼 서비스가 거의 멈췄다.
+
+근본 원인은 긴 transaction이지만 수정과 배포에는 시간이 필요하다.
+
+운영자는 임시로 traffic을 줄이거나 인스턴스를 늘리거나 문제 기능을 끌 수 있다.
+
+이런 조치는 근본 원인 수정가 아니다.
+
+그래서 Agent 기록에도 다음을 구분하는 편이 좋다.
+
+~~~text
+Mitigation
+지금 장애를 줄이는 조치
+
+Fix
+원인을 없애는 수정
+~~~
+
+임시 조치가 성공했다고 문제 해결로 기록하면 다음 장애 때 같은 문제가 반복된다.
+
+## 5. 운영 변경은 되돌릴 수 있어야 한다
+
+Agent가 수정안을 만들고 staging에서 검증했다고 하자.
+
+그래도 운영에서는 예상하지 못한 문제가 생길 수 있다.
+
+그래서 운영 action에는 최소한 다음이 필요하다.
+
+- 변경 전 버전
+- 변경 후 버전
+- rollback 경로
+- 배포 후 확인할 신호
+- 중단 조건
+
+예를 들어 error rate가 일정 수준을 넘으면 자동 rollback하는 식이다.
+
+## 6. 승인도 위험한 작업에 집중한다
+
+모든 Prometheus 조회마다 사람이 승인해야 한다면 시스템을 쓸 수 없다.
+
+반대로 운영 restart나 배포 변경을 무조건 자동 허용하기도 어렵다.
+
+작업을 위험도에 따라 나눈다.
+
+~~~text
+낮음
+metrics/logs/traces 조회
+
+중간
+JFR/thread dump 생성
+staging 재시작
+
+높음
+production restart
+configuration 변경
+deployment
+~~~
+
+승인은 높은 위험 작업에 집중한다.
+
+## 7. Agent가 만든 수정도 변경 이유가 보여야 한다
+
+단순히 diff만 남기지 않는다.
+
+좋은 수정 기록에는 다음 연결이 있어야 한다.
+
+~~~text
+확인한 증거
+→ 선택한 원인 후보
+→ 바꾼 코드
+→ 기대하는 변화
+~~~
+
+예:
+~~~text
+connection acquire 2.8s
++ 긴 transaction 확인
+→ 외부 API 호출을 transaction 밖으로 이동
+→ pending connection 감소 기대
+~~~
+
+이렇게 해야 코드 리뷰도 쉬워진다.
+
+## 8. 작은 자동화부터 시작한다
+
+처음부터 운영 auto-remediation을 목표로 할 필요는 없다.
+
+현실적인 발전 순서는 다음과 같다.
+
+~~~text
+1. 원인 후보와 근거 제시
+2. patch 제안
+3. 로컬 테스트 자동화
+4. staging 검증 자동화
+5. production 변경은 승인 후 실행
+~~~
+
+운영 경험이 쌓인 일부 안전한 작업만 나중에 자동화 범위를 넓힐 수 있다.
+
+## 이 장의 한 문장
+
+> 보는 권한과 바꾸는 권한을 분리한다.
+
+> Agent의 자율성은 운영 변경 권한을 많이 주는 것으로 측정하지 않는다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-GRAFANA-MCP] Grafana MCP
+- [S-ORACLE-JCMD] Oracle JDK 25 — jcmd/JFR
+
+
+# 21장. 수정했다고 끝난 것이 아니다
+
+Agent가 코드를 수정했다.
+
+테스트도 통과했다.
+
+문제가 해결됐다고 말해도 될까?
+
+아직 한 단계가 남았다.
+
+처음 장애를 확인했던 신호가 실제로 좋아졌는지 봐야 한다.
+
+## 1. 처음 증상으로 돌아간다
+
+DB pool 장애였다면 처음 본 것은 p99와 pending connection이었다.
+
+수정 후 같은 부하에서 다시 본다.
+
+~~~text
+Before
+p99 3.1s
+pending 37
+connection acquire 2.8s
+
+After
+p99 240ms
+pending 1
+connection acquire 8ms
+~~~
+
+이 비교가 있어야 실제 장애 해결을 말할 수 있다.
+
+## 2. 테스트 통과와 운영 해결은 다르다
+
+단위 테스트는 로직이 맞는지 확인한다.
+
+통합 테스트는 여러 컴포넌트가 함께 동작하는지 확인한다.
+
+하지만 운영 장애는 latency, concurrency, memory, thread, platform 상태 때문에 생길 수 있다.
+
+따라서 test pass만으로는 부족하다.
+
+## 3. 수정한 코드가 실제로 배포됐는지도 확인한다
+
+의외로 자주 빠지는 단계다.
+
+Agent가 commit B에서 수정했고 CI도 통과했다.
+
+그런데 운영은 여전히 commit A image를 실행하고 있을 수 있다.
+
+그래서 검증 전에 다음을 확인한다.
+
+~~~text
+expected version = B
+deployed version = B
+image digest = expected digest
+~~~
+
+버전 확인이 없으면 좋은 결과가 우연히 다른 배포 때문인지 구분하기 어렵다.
+
+## 4. 가능하면 같은 workload로 다시 확인한다
+
+수정 전에는 100 concurrent users였는데 수정 후에는 5명으로 시험했다면 비교가 어렵다.
+
+가능한 한 같은 조건을 맞춘다.
+
+- 입력 데이터
+- 요청 수
+- 동시성
+- timeout
+- 환경 설정
+
+완전히 같게 만들 수 없다면 차이를 기록한다.
+
+## 5. 하나의 숫자만 좋아졌다고 끝내지 않는다
+
+예를 들어 latency를 줄이기 위해 cache를 추가했다.
+
+p99는 좋아졌지만 stale data 오류가 늘 수 있다.
+
+또 timeout을 줄여 latency는 좋아 보이지만 error rate가 올라갈 수 있다.
+
+그래서 기능 결과와 장애 신호를 같이 본다.
+
+예:
+~~~text
+latency 개선
++ error rate 유지
++ 데이터 정확성 유지
++ resource 사용량 허용 범위
+~~~
+
+## 6. 부분 해결도 있다
+
+수정 후 다음처럼 나올 수 있다.
+
+~~~text
+p99 3.1s → 700ms
+pending 37 → 5
+error rate 정상
+~~~
+
+좋아졌지만 목표가 300ms라면 완전한 해결은 아니다.
+
+또 이런 경우도 있다.
+
+~~~text
+p99 정상
+하지만 GC pause 여전히 높음
+~~~
+
+이 경우 다른 문제가 남았을 수 있다.
+
+Agent는 성공/실패 둘 중 하나만 선택하기보다 부분 해결을 기록할 수 있어야 한다.
+
+## 7. 잘못된 수정은 before/after에서 드러난다
+
+connection pool 문제에서 pool size만 크게 늘렸다고 하자.
+
+초기에는 p99가 좋아질 수 있다.
+
+하지만 traffic을 더 올리면 pending이 다시 증가한다.
+
+근본 원인이 긴 transaction이라면 병목을 뒤로 미룬 것뿐이다.
+
+그래서 검증은 한 번의 happy path가 아니라 원래 문제가 나타나던 조건에서 해야 한다.
+
+## 8. 검증 결과도 증거로 남긴다
+
+수정 전후 자료는 코드 리뷰와 장애 회고에 유용하다.
+
+예:
+~~~text
+Fix
+외부 API 호출을 transaction 밖으로 이동
+
+Before
+p99 3.1s / pending 37
+
+After
+p99 240ms / pending 1
+
+Regression
+기존 login 기능 테스트 통과
+~~~
+
+이 정도만 남아도 왜 이 수정이 효과가 있었는지 나중에 다시 확인할 수 있다.
+
+## 9. 다음 장애를 위한 규칙으로 바로 고정하지 않는다
+
+이번에 같은 증상이 connection pool 문제였다고 다음번에도 그렇다고 단정하면 안 된다.
+
+환경과 버전, 원인이 달라질 수 있다.
+
+과거 장애는 참고자료이지 현재의 사실이 아니다.
+
+## 10. Agent가 따라야 할 검증 순서
+
+~~~text
+patch
+→ 테스트
+→ 올바른 버전 배포 확인
+→ 같은 workload
+→ 처음 증상 재확인
+→ 부작용 확인
+→ 잔여 이상 기록
+~~~
+
+## 이 장의 한 문장
+
+> 처음 문제를 발견한 신호를 수정 후 다시 본다.
+
+> 테스트 통과와 장애 해결은 같은 말이 아니다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-OPENRCA] OpenRCA
+- [S-BTS-AGENTBENCH] BTS-AgentBench
+
+
+# 22장. Agentic Debugging을 어떻게 평가할까
+
+Agent가 디버깅을 잘한다고 말하려면 무엇을 측정해야 할까?
+
+최종 정답률만 보면 부족하다.
+
+우연히 맞힐 수도 있고, 너무 많은 로그를 읽고 비싼 조회를 남발할 수도 있기 때문이다.
+
+## 1. 네 가지 조건을 비교한다
+
+이 책에서 제안한 실험은 단순하다.
+
+~~~text
+A. 소스코드만 제공
+
+B. 소스 + raw log bundle
+
+C. 소스 + Grafana/Tempo 조회 도구
+
+D. C + 디버깅 순서와 기록 규칙
+~~~
+
+같은 Agent와 같은 장애에서 차이를 본다.
+
+## 2. 원인을 맞혔는가
+
+가장 기본적인 지표다.
+
+- 원인 component
+- 원인 reason
+
+둘을 나눠 볼 수 있다.
+
+## 3. 제대로 고쳤는가
+
+원인을 맞혀도 수정이 틀릴 수 있다.
+
+그래서 다음도 본다.
+
+- correct 수정
+- reproduction success
+- regression test
+- 장애 signal 개선
+
+## 4. 필요한 증거를 실제로 봤는가
+
+Agent가 connection pool 문제를 맞혔지만 pool metric도 trace도 보지 않았다면 우연일 수 있다.
+
+그래서 각 scenario마다 최소한 봐야 할 증거를 정해둘 수 있다.
+
+## 5. 얼마나 많이 읽었는가
+
+같은 정답이라면 적은 조회와 적은 token으로 찾는 쪽이 운영에서 더 낫다.
+
+측정 후보:
+- token
+- 조회 수
+- 반환 데이터 크기
+- scan bytes
+- 진단 단계 수
+
+## 6. 안전하게 조회했는가
+
+정답을 맞혔더라도 운영 전체를 무제한 검색했다면 좋은 시스템이 아니다.
+
+그래서 다음도 기록한다.
+
+- 범위 밖 조회
+- 너무 넓은 시간 범위
+- 민감정보 노출
+- 불필요한 heap/JFR capture
+- mutation attempt
+
+## 7. 실패 이유를 분류한다
+
+점수만 보면 어디를 개선해야 할지 모른다.
+
+실패를 다음처럼 나눌 수 있다.
+
+~~~text
+필요한 자료를 못 찾음
+자료는 찾았지만 연결 못 함
+자료를 잘못 해석함
+잘못된 버전의 코드 봄
+도구를 잘못 사용함
+검증 부족
+~~~
+
+이 분류가 다음 시스템 개선으로 이어진다.
+
+## 8. 가상의 비교 결과로 보면 더 쉽다
+
+아래 숫자는 실제 실험 결과가 아니라 평가 방법을 설명하기 위한 예시다.
+
+예를 들어 같은 connection pool 장애를 네 조건에서 10회씩 실행했다고 하자.
+
+| 조건 | 원인 진단 | 올바른 수정 | 같은 신호로 재검증 | 평균 조회 수 |
+|---|---:|---:|---:|---:|
+| A. 소스만 | 3/10 | 2/10 | 1/10 | 0 |
+| B. 소스 + raw logs | 5/10 | 3/10 | 1/10 | 0 |
+| C. 관측 조회 도구 | 8/10 | 7/10 | 5/10 | 12 |
+| D. 조회 도구 + 조사 순서 | 8/10 | 7/10 | 8/10 | 7 |
+
+이런 결과가 나왔다면 단순히 D가 최고라고 끝내지 않는다.
+
+C와 D의 원인 진단률이 같다면 조사 순서를 강제한 효과는 진단 정확도보다 **검증률과 조회 효율**에서 나타났다고 해석할 수 있다.
+
+반대로 D가 조회 수는 줄였지만 정답률도 낮아졌다면 제한이 지나쳤을 수 있다.
+
+평가는 설계를 칭찬하기 위한 숫자가 아니라 어디가 실제로 도움이 됐는지 찾는 도구다.
+
+## 9. 한 번의 성공을 믿지 않는다
+
+Agent 실행은 변동성이 있다.
+
+그래서 같은 scenario를 여러 번 실행하고 단일 성공률과 반복 신뢰성을 함께 본다.
+
+## 10. 이 장에서 기억할 것
+
+> Agentic Debugging 평가는 정답뿐 아니라 과정, 비용, 안전성, 검증까지 함께 봐야 한다.
+
+> 좋은 디버깅 시스템은 왜 맞았는지를 다시 설명할 수 있어야 한다.
+
+### 참고 자료
+
+출처 상세: [References](#references)
+
+- [S-OPENRCA] OpenRCA
+- [S-BTS-AGENTBENCH] BTS-AgentBench
+- [S-RCA-REALWORLD-2026] Real-world 관측 데이터 RCA
+
+
+---
+
+# 맺으며 — 더 많은 로그보다 더 좋은 관측 인터페이스
+
+이 책은 AI에게 로그를 잘 읽히는 방법에서 시작했다.
+
+하지만 끝까지 따라오면 질문이 조금 달라진다.
+
+문제는 로그 형식이 아니었다.
+
+문제는 실행 중인 애플리케이션과 Coding Agent 사이에 어떤 연결을 만들 것인가였다.
+
+사람은 이미 오래전부터 이런 방식으로 디버깅해 왔다.
+
+지표를 보고 범위를 줄인다.
+
+느린 요청 하나를 찾는다.
+
+같은 요청의 로그를 본다.
+
+필요하면 profile과 JVM 상태를 본다.
+
+배포 버전을 확인한다.
+
+가설을 세우고 틀린 가설을 버린다.
+
+수정한 뒤 처음 증상을 다시 확인한다.
+
+Agent에게 필요한 것도 크게 다르지 않다.
+
+~~~text
+소스코드
+  +
+실행 중에 남은 증거
+  +
+안전하게 조회할 수 있는 작은 도구
+  +
+수정 전후를 확인하는 습관
+~~~
+
+Prometheus, Loki, Tempo, Pyroscope, OpenTelemetry, Grafana는 이 문제를 해결하기 위한 좋은 재료다.
+
+새로운 AI 전용 모니터링 시스템을 처음부터 만들 필요는 없다.
+
+이미 있는 관측 시스템을 Agent가 이해할 수 있는 방식으로 연결하면 된다.
+
+그리고 가장 중요한 것은 연결 뒤의 규칙이다.
+
+- 너무 많이 보지 않는다.
+- 같은 요청의 정보를 묶는다.
+- 사실과 추측을 나눈다.
+- 운영 버전을 확인한다.
+- 보는 권한과 바꾸는 권한을 나눈다.
+- 수정 후 처음 증상을 다시 본다.
+
+결국 핵심은 단순하다.
+
+> Agent에게 더 많은 로그를 주는 것이 아니라, 필요한 증거를 스스로 찾고 확인할 수 있는 길을 만들어야 한다.
+
+소스코드는 프로그램이 어떻게 만들어졌는지를 보여준다.
+
+관측 데이터는 프로그램이 실제로 어떻게 움직였는지를 보여준다.
+
+두 세계가 연결될 때 Coding Agent는 비로소 실제 애플리케이션을 디버깅할 수 있다.
+
+---
+
+# References
+
+기준일: 2026-10-05
+
+본문의 `[S-...]` 표시는 이 목록의 Source ID를 가리킨다.
+
+제품 문서와 사양은 출간 시점에 변경될 수 있으므로 최종 출간 전 다시 확인한다. Preprint는 peer-reviewed 연구와 구분해 표기한다.
+
+## 공식 문서와 오픈소스
+
+### [S-OTEL-LOGS] OpenTelemetry — Logs
+
+- 유형: 공식 사양
+- URL: https://opentelemetry.io/docs/specs/otel/logs/
+- 사용 위치: 로그와 trace의 TraceId/SpanId 연결, 공통 Resource context
+
+### [S-OTEL-COLLECTOR] OpenTelemetry — Collector
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://opentelemetry.io/docs/collector/
+- 사용 위치: 수집 파이프라인, receiver/processor/exporter 구조
+
+### [S-OTEL-TRANSFORM] OpenTelemetry — Transforming telemetry
+
+- 유형: 공식 문서
+- URL: https://opentelemetry.io/docs/collector/transforming-telemetry/
+- 사용 위치: filter, transform, redaction, 수집 단계의 데이터 거버넌스
+- 주의: 복잡한 transformation은 Collector 성능에 영향을 줄 수 있음
+
+### [S-OTEL-SQL] OpenTelemetry — Semantic conventions for SQL databases client operations
+
+- 유형: 공식 사양
+- URL: https://opentelemetry.io/docs/specs/semconv/db/sql/
+- 확인일: 2026-10-05
+- 사용 위치: db.query.summary, db.query.text, SQL parameter 수집과 민감정보 처리
+- 현재 안정성: db.query.summary와 db.query.text는 Stable / Recommended
+- 현재 안정성: db.query.parameter.<key>는 Development / Opt-In
+
+### [S-OTEL-SERVICE] OpenTelemetry — Service semantic conventions
+
+- 유형: 공식 사양
+- URL: https://opentelemetry.io/docs/specs/semconv/resource/service/
+- 확인일: 2026-10-05
+- 사용 위치: service.name, service.version, service.instance.id
+- 현재 안정성: service.name은 Stable / Required, service.version은 Stable / Recommended
+
+### [S-OTEL-K8S] OpenTelemetry — Specify resource attributes using Kubernetes annotations
+
+- 유형: 공식 가이드
+- URL: https://opentelemetry.io/docs/specs/semconv/non-normative/k8s-attributes/
+- 사용 위치: Kubernetes 환경에서 service.version 계산, image tag/digest와 서비스 버전 연결
+
+### [S-PROM-API] Prometheus — HTTP API
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://prometheus.io/docs/prometheus/latest/querying/api/
+- 사용 위치: instant/range query, metric discovery, machine-readable 결과
+
+### [S-PROM-EXEMPLAR] Prometheus — Exposition formats / Exemplars
+
+- 유형: 공식 문서
+- URL: https://prometheus.io/docs/instrumenting/exposition_formats/
+- 사용 위치: 집계된 metric에서 실제 trace로 이동
+
+### [S-LOKI-METADATA] Grafana Loki — Structured metadata
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/loki/latest/get-started/labels/structured-metadata/
+- 사용 위치: trace_id 같은 high-cardinality 값을 stream label과 분리
+
+### [S-LOKI-QUERY] Grafana Loki — Query best practices
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/loki/latest/query/bp-query/
+- 사용 위치: 시간 범위와 label selector를 이용한 로그 검색 범위 축소
+
+### [S-TEMPO-API] Grafana Tempo — HTTP API
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/tempo/latest/api_docs/
+- 사용 위치: trace ID 조회, TraceQL search, result/time limit
+
+### [S-TEMPO-METRICS] Grafana Tempo — Metrics from traces
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/tempo/latest/metrics-from-traces/
+- 사용 위치: trace에서 RED metric과 service graph 생성, trace 집계
+
+### [S-TEMPO-AI] Grafana Tempo — Tempo and AI
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/tempo/latest/introduction/tempo-and-ai/
+- MCP server: https://grafana.com/docs/tempo/latest/api_docs/mcp-server/
+- 확인일: 2026-10-05
+- 사용 위치: Tempo MCP, Agent용 trace 조회, LLM용 간소화 응답
+- 현재 주의: MCP server는 설정에서 별도로 활성화해야 한다.
+- 현재 주의: application/vnd.grafana.llm 응답 형식은 변경 가능성이 있어 안정적 프로그램 계약으로 의존하지 않는다.
+
+### [S-PYROSCOPE] Grafana Pyroscope
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/pyroscope/latest/
+- 사용 위치: continuous profiling, trace와 profile 연결
+
+### [S-GRAFANA-MCP] Grafana — MCP server
+
+- 유형: 공식 문서 / 오픈소스
+- URL: https://grafana.com/docs/grafana/latest/developer-resources/mcp/
+- 설정: https://grafana.com/docs/grafana/latest/developer-resources/mcp/configure/
+- CLI flags: https://grafana.com/docs/grafana/latest/developer-resources/mcp/configure/command-line-flags/
+- Tool/RBAC reference: https://grafana.com/docs/grafana/latest/developer-resources/mcp/reference/mcp-tools-table/
+- 저장소: https://github.com/grafana/mcp-grafana
+- 확인일: 2026-10-05
+- 사용 위치: Prometheus/Loki/Tempo/Pyroscope를 Agent가 직접 조회, read-only와 query guardrail
+- 현재 주의: Loki guardrail mode의 기본값은 off이며 운영 보호 장치로 사용하려면 enforce를 명시해야 한다.
+- 현재 주의: --disable-write는 raw SQL/Influx query 도구도 제거한다.
+
+### [S-SPRING-OBS] Spring Boot — Observability
+
+- 유형: 공식 문서
+- URL: https://docs.spring.io/spring-boot/reference/actuator/observability.html
+- Tracing: https://docs.spring.io/spring-boot/reference/actuator/tracing.html
+- 확인일: 2026-10-05
+- 사용 위치: Micrometer Observation, tracing, Spring Boot 관측 구성
+- 현재 주의: 자동 network trace propagation에는 auto-configured RestTemplateBuilder, RestClient.Builder, WebClient.Builder 사용이 필요하다.
+- 주의: Spring Boot 버전별 지원 범위를 출간 전 재확인
+
+### [S-ORACLE-JCMD] Oracle JDK 25 — The jcmd Command
+
+- 유형: 공식 문서
+- URL: https://docs.oracle.com/en/java/javase/25/docs/specs/man/jcmd.html
+- 확인일: 2026-10-05
+- 사용 위치: JFR.start, JFR.check, JFR.dump, JVM 진단 명령과 영향도
+- 현재 상태: JFR.start/check/dump는 Low impact로 문서화되어 있고 heap dump는 High impact로 문서화되어 있다.
+- 주의: JFR.dump의 GC root 경로 수집은 애플리케이션 pause를 유발할 수 있음
+
+### [S-K8S-EVENT] Kubernetes — Event API
+
+- 유형: 공식 문서
+- URL: https://kubernetes.io/docs/reference/kubernetes-api/core/event-v1/
+- 사용 위치: Kubernetes Event의 제한된 retention과 best-effort 성격
+
+### [S-DRAIN3] Drain3
+
+- 유형: 오픈소스
+- URL: https://github.com/logpai/Drain3
+- 사용 위치: 반복 로그의 template mining과 패턴 축약
+
+## 연구와 벤치마크
+
+### [S-OPENRCA] OpenRCA
+
+- 유형: peer-reviewed benchmark / 오픈소스
+- Venue: ICLR 2025
+- 프로젝트: https://microsoft.github.io/OpenRCA/
+- 저장소: https://github.com/microsoft/OpenRCA
+- 사용 위치: logs/metrics/traces를 함께 사용하는 RCA, Python 기반 telemetry retrieval, model context와 telemetry working set 분리
+
+### [S-NEXT] NExT: Teaching Large Language Models to Reason about Code Execution
+
+- 유형: peer-reviewed paper
+- Venue: ICML 2024
+- URL: https://proceedings.mlr.press/v235/ni24a.html
+- 사용 위치: execution trace를 이용한 runtime-aware reasoning과 program repair
+- 한계: production distributed observability를 직접 다루는 연구는 아님
+
+### [S-LLM4LOG] LLM4Log
+
+- 유형: systematic review / preprint
+- 게시: 2026-03
+- URL: https://arxiv.org/abs/2604.16359
+- 사용 위치: LLM 기반 logging, parsing, anomaly detection, RCA 연구 지형
+- 주의: preprint이며 세부 주장에는 가능한 한 원 논문을 우선함
+
+### [S-RCA-REALWORLD-2026] How Far Can Root Cause Analysis Go on Real-World Telemetry Data?
+
+- 유형: preprint
+- 게시: 2026-07
+- URL: https://arxiv.org/abs/2607.13548
+- 사용 위치: Reasoning Gap과 Data Ambiguity 구분
+- 주의: preprint
+
+### [S-BTS-AGENTBENCH] BTS-AgentBench
+
+- 유형: benchmark / 오픈소스 / preprint
+- 게시: 2026-08
+- URL: https://arxiv.org/abs/2608.27334
+- 저장소: https://github.com/kjy7567/BTS-AgentBench
+- 사용 위치: read-only telemetry를 typed/bounded agent episode로 구성, gold evidence와 replay
+- 한계: building telemetry 대상이며 software observability benchmark는 아님
+
+## 본문에서 직접 사용하지 않는 보조 연구
+
+다음 자료는 research 디렉터리에 보존하지만 현재 본문의 핵심 References에는 포함하지 않는다.
+
+- MicroRCA
+- MicroRCA-Agent
+- SoK: LLM-based Log Parsing
+- DeepLog
+- LogBERT
+- LogGPT
+- LogLLM
+- LogRAIL
+- AgentDebugX
+
+필요한 장을 확장할 때 원 논문을 다시 확인한 뒤 References에 승격한다.
+

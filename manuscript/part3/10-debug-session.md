@@ -137,7 +137,9 @@ DB CPU 정상
 
 > 수정은 증거와 연결되어야 하고, 검증은 처음 증상으로 돌아가야 한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OPENRCA] OpenRCA
 - [S-BTS-AGENTBENCH] BTS-AgentBench

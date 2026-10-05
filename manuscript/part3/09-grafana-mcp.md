@@ -118,7 +118,9 @@ Grafana MCP
 
 > 하지만 데이터를 볼 수 있게 하는 것과 디버깅 절차를 만드는 것은 다른 일이다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-GRAFANA-MCP] Grafana MCP
 - [S-TEMPO-AI] Tempo and AI

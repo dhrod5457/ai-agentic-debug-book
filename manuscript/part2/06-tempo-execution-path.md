@@ -1,6 +1,6 @@
 # 6장. Tempo로 실제 실행 경로를 따라간다
 
-Metric에서 login-service의 특정 시간대가 문제라는 사실까지 좁혔다.
+Metric에서 login-서비스의 특정 시간대가 문제라는 사실까지 좁혔다.
 
 이제 질문이 바뀐다.
 
@@ -12,7 +12,7 @@ Metric에서 login-service의 특정 시간대가 문제라는 사실까지 좁�
 
 모든 trace를 읽을 필요는 없다.
 
-예를 들어 incident window에서 duration이 2초를 넘고 status가 error이거나 latency가 높은 trace 몇 개를 찾는다.
+예를 들어 장애 window에서 duration이 2초를 넘고 status가 error이거나 latency가 높은 trace 몇 개를 찾는다.
 
 ~~~text
 search_traces
@@ -23,7 +23,7 @@ range=09:10~09:18
 limit=5
 ~~~
 
-이제 대량 telemetry가 몇 개의 execution으로 줄었다.
+이제 대량 관측 데이터가 몇 개의 execution으로 줄었다.
 
 ## 2. Trace는 시간의 구조를 보여준다
 
@@ -48,7 +48,7 @@ Agent 입장에서 중요한 것은 TraceQL 전체 문법을 아는 것이 아�
 
 - 느린 trace
 - error trace
-- 특정 service를 거친 trace
+- 특정 서비스를 거친 trace
 - 특정 span attribute를 가진 trace
 - 특정 duration 이상인 span
 
@@ -56,9 +56,9 @@ Agent 입장에서 중요한 것은 TraceQL 전체 문법을 아는 것이 아�
 
 한 trace에서 이상을 발견했다고 전체 장애의 원인이라고 단정하면 안 된다.
 
-예를 들어 한 trace에서 payment-service가 느렸다면 다음 질문이 필요하다.
+예를 들어 한 trace에서 payment-서비스가 느렸다면 다음 질문이 필요하다.
 
-> incident window의 payment span이 전반적으로 느렸는가?
+> 장애 window의 payment span이 전반적으로 느렸는가?
 
 TraceQL metrics나 trace-derived metrics를 사용하면 span 집합을 다시 aggregate할 수 있다.
 
@@ -95,11 +95,11 @@ Agent tool에 compare_traces가 유용한 이유다.
 
 이 변화는 중요하다.
 
-Observability backend가 더 이상 사람의 UI만을 위한 저장소가 아니라 machine reasoning client를 직접 고려하기 시작했다는 뜻이다.
+관측 시스템 backend가 더 이상 사람의 UI만을 위한 저장소가 아니라 machine reasoning client를 직접 고려하기 시작했다는 뜻이다.
 
-하지만 Tempo MCP가 root cause를 보장하는 것은 아니다.
+하지만 Tempo MCP가 원인를 보장하는 것은 아니다.
 
-Tempo는 evidence를 제공한다. Hypothesis와 patch는 다른 책임이다.
+Tempo는 증거를 제공한다. 원인 후보와 수정는 다른 책임이다.
 
 ## 7. Full trace를 항상 모델에 넣지 않는다
 
@@ -110,7 +110,7 @@ Agent가 먼저 필요한 것은 다음과 같은 summary일 수 있다.
 - critical path
 - slowest spans
 - error spans
-- service transitions
+- 서비스 transitions
 - repeated spans
 - relevant attributes
 
@@ -154,7 +154,7 @@ A 서비스에서는 B를 호출한 흔적이 있는데 B 쪽 span이 보이지 
 
 가능성은 여러 가지다.
 
-- context propagation이 빠졌다.
+- 맥락 propagation이 빠졌다.
 - sampling 정책이 다르다.
 - instrumentation이 누락됐다.
 - 다른 trace로 분리됐다.

@@ -121,7 +121,9 @@ Agent 실행은 변동성이 있다.
 
 > 좋은 디버깅 시스템은 왜 맞았는지를 다시 설명할 수 있어야 한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - [S-OPENRCA] OpenRCA
 - [S-BTS-AGENTBENCH] BTS-AgentBench

@@ -104,7 +104,9 @@ latency = 180ms
 
 > Agent가 조회 시간뿐 아니라 한 요청 안의 반복 횟수를 볼 수 있어야 한다.
 
-### 주요 근거
+### 참고 자료
+
+출처 상세: [References](../references.md)
 
 - SQL/database 증거 research
 - [S-TEMPO-API] Tempo HTTP API
